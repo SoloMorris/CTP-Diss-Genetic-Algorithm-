@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Laser : MonoBehaviour
+public class Laser : Bullet
 {
     Vector2 startPosition = new Vector2(-20, -20);
     [SerializeField] [Range(1,30)] private float speed = 15.0f;
@@ -10,7 +10,7 @@ public class Laser : MonoBehaviour
     [SerializeField] private GameObject player;
     public bool hitPlayer;
     public bool miss;
-
+    
     // Start is called before the first frame update
     void Start()
     {
@@ -50,7 +50,7 @@ public class Laser : MonoBehaviour
         //Just write a fucntion to kill the alien, retard
     }
 
-    public void ResetBullet()
+    override public void ResetBullet()
     {
         transform.position = startPosition;
         GetComponent<Rigidbody2D>().velocity = Vector2.zero;

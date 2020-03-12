@@ -56,14 +56,20 @@ public class Bullet : MonoBehaviour
                 ResetBullet();
             }
         }
-        //Just write a fucntion to kill the alien, retard
+        //Just write a function to kill the alien, retard
     }
 
-    public void ResetBullet()
+    virtual public void ResetBullet()
     {
         transform.position = startPosition;
         GetComponent<Rigidbody2D>().velocity = Vector2.zero;
         inUse = false;
 
+    }
+
+    virtual public void HitTarget(Collider2D target)
+    {
+
+        ResetBullet();
     }
 }

@@ -135,8 +135,8 @@ public class GeneticAlien : MonoBehaviour
         }
         else
         {
-            difficultyText.text = ("That wave's effectiveness was " + FindDifficulty().ToString() + ".");
-            difficultyText.enabled = true;
+            //difficultyText.text = ("That wave's effectiveness was " + FindDifficulty().ToString() + ".");
+            //difficultyText.enabled = true;
             if (elapsedTime > 0.5f)
             {
 
