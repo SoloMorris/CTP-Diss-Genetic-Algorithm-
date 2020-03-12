@@ -4,25 +4,7 @@ using UnityEngine;
 
 public class Laser : Bullet
 {
-    Vector2 startPosition = new Vector2(-20, -20);
-    [SerializeField] [Range(1,30)] private float speed = 15.0f;
-    public bool inUse = false;
-    [SerializeField] private GameObject player;
     public bool hitPlayer;
-    public bool miss;
-    
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-
     private void FixedUpdate()
     {
         if (inUse)
@@ -33,18 +15,14 @@ public class Laser : Bullet
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (inUse)
+        if (inUse && !collision.gameObject.CompareTag("Alien"))
         {
-            if (collision.gameObject.CompareTag("Wall"))
-            {
-                ResetBullet();
-            }
-            else if (collision.gameObject.CompareTag("Player"))
+            HitTarget(collision, "Wall", false);
+            if (HitTarget(collision, "Player"))
             {
                 GeneticAlien._instance.ResetPlayerAI();
                 GeneticAlien._instance.ResetAliens();
                 GeneticAlien._instance.EndRound();
-                ResetBullet();
             }
         }
         //Just write a fucntion to kill the alien, retard
@@ -55,7 +33,12 @@ public class Laser : Bullet
         transform.position = startPosition;
         GetComponent<Rigidbody2D>().velocity = Vector2.zero;
         //inUse = false;
-        Destroy(gameObject);
+        StartCoroutine(KillLaser());
+    }
 
+    IEnumerator KillLaser()
+    {
+        yield return new WaitForEndOfFrame();
+        Destroy(gameObject);
     }
 }

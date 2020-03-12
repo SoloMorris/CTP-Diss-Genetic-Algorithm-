@@ -102,14 +102,14 @@ public class GeneticAlien : MonoBehaviour
         for (int i = 0; i < waveSize; i++)
         {
             var newAlien = Instantiate(alienPrefab);
-
-            newAlien.GetComponent<Alien>().instance = newAlien.gameObject;
+            var alienBrain = newAlien.GetComponent<Alien>();
+            alienBrain.instance = newAlien.gameObject;
             ga.population[i] = (new DNA(allowedMoves, GetRandomMovementDirection, FitnessFunction, newAlien.GetComponent<Alien>()));
-            newAlien.GetComponent<Alien>().dna = ga.population[i];
-            newAlien.GetComponent<Alien>().instance.gameObject.SetActive(false);
-            newAlien.GetComponent<Alien>().instance.GetComponent<AlienController>().uid = i;
-            newAlien.GetComponent<Alien>().id = i;
-            newAlien.GetComponent<Alien>().laserPrefab = laserPrefab;
+            alienBrain.dna = ga.population[i];
+            alienBrain.instance.gameObject.SetActive(false);
+            alienBrain.instance.GetComponent<AlienController>().uid = i;
+            alienBrain.id = i;
+            alienBrain.laserPrefab = laserPrefab;
 
             aliens.Add(newAlien);
             
@@ -153,10 +153,11 @@ public class GeneticAlien : MonoBehaviour
         {
             if (aliens[i].GetComponent<Alien>().instance.GetComponent<AlienController>().killed)
             {
+                var alien = aliens[i].GetComponent<Alien>().instance.gameObject;
 
-                aliens[i].GetComponent<Alien>().instance.gameObject.transform.position = new Vector3(-99, -99);
-                aliens[i].GetComponent<Alien>().instance.gameObject.transform.localScale = alienSizeDefault;
-                aliens[i].GetComponent<Alien>().instance.gameObject.SetActive(false);
+                alien.transform.position = new Vector3(-99, -99);
+                alien.transform.localScale = alienSizeDefault;
+                alien.SetActive(false);
                 killCount++;
 
             }

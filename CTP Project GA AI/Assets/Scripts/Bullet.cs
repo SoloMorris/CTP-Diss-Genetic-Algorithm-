@@ -4,30 +4,26 @@ using UnityEngine;
 
 public class Bullet : MonoBehaviour
 {
-    Vector2 startPosition = new Vector2(-20, -20);
-    private float speed = 15.0f;
+    protected Vector2 startPosition = new Vector2(-20, -20);
+    [SerializeField] [Range(1, 30)] protected float speed = 15.0f;
     public bool inUse = false;
-    [SerializeField] private GameObject player;
+    [SerializeField] protected GameObject player;
     public bool hitAlien;
     public bool miss;
 
+    [SerializeField] protected bool bulletsCollide;
+    protected Rigidbody2D myBody;
     // Start is called before the first frame update
     void Start()
     {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
+        myBody = GetComponent<Rigidbody2D>();
     }
 
     private void FixedUpdate()
     {
         if (inUse)
         {
-            GetComponent<Rigidbody2D>().velocity = new Vector2(0, 1) * speed;
+            myBody.velocity = new Vector2(0, 1) * speed;
         }
     }
 
@@ -35,28 +31,20 @@ public class Bullet : MonoBehaviour
     {
         if (inUse)
         {
-            if (collision.gameObject.CompareTag("Wall"))
-            {
-                ResetBullet();
-                Stats.instance.MissedShot();
-            }
-            else if (collision.gameObject.CompareTag("Alien"))
-            {
-                var hitAlien = GeneticAlien._instance.GetAlienList()[collision.gameObject.GetComponent<AlienController>().uid].GetComponent<GeneticAlien.Alien>();
+            HitTarget(collision, "Wall", false);
+            if (HitTarget(collision, "Alien"))
+            { 
+                var hitAlien = GeneticAlien._instance.GetAlienList()[collision.gameObject.
+                    GetComponent<AlienController>().uid].GetComponent<GeneticAlien.Alien>();
+                var hitAlienCont = hitAlien.instance.GetComponent<AlienController>();
 
-                GeneticAlien._instance.GetAlienList()[collision.gameObject.GetComponent<AlienController>().uid].
-                      GetComponent<GeneticAlien.Alien>().instance.GetComponent<AlienController>().deathPosition = hitAlien.instance.transform.position;
-
-                hitAlien.instance.GetComponent<AlienController>().killed = true;
-
-                GeneticAlien._instance.GetAlienList()[collision.gameObject.GetComponent<AlienController>().uid].
-                      GetComponent<GeneticAlien.Alien>().alive = false;
-
-                Stats.instance.HitShot();
-                ResetBullet();
+                hitAlienCont.deathPosition = hitAlien.instance.transform.position;
+                hitAlienCont.killed = true;
+                hitAlien.alive = false;
             }
         }
         //Just write a function to kill the alien, retard
+        
     }
 
     virtual public void ResetBullet()
@@ -67,9 +55,28 @@ public class Bullet : MonoBehaviour
 
     }
 
-    virtual public void HitTarget(Collider2D target)
+    virtual protected bool BulletLaserCollision()
     {
-
-        ResetBullet();
+        if (bulletsCollide)
+            return true;
+        else
+            return false;
+    }
+    virtual protected bool HitTarget(Collider2D target, string tag, bool valid = true)
+    {
+        if (target.gameObject.CompareTag(tag) && valid)
+        {
+            Stats.instance.HitShot();
+            ResetBullet();
+            return true;
+        }
+        else if (target.gameObject.CompareTag(tag) && !valid)
+        {
+            Stats.instance.MissedShot();
+            ResetBullet();
+            return false;
+        }
+        print("Invalid shot! Fired by: " +gameObject.name);
+        return false;
     }
 }
