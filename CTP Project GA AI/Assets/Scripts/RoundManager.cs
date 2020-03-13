@@ -8,19 +8,17 @@ public class RoundManager : MonoBehaviour
     public int currentRound;
     public bool roundActive = false;
     public float difficulty;
+    public float deathTimer = 3.0f;
+    public float waveTimer = 0.1f;
+    private float elapsedTime;
+    private float targetTime;
     // Start is called before the first frame update
 
     private void Awake()
     {
         if (instance == null) instance = this;
     }
-
-    private void Start()
-    {
-        
-    }
-
-    private void Update()
+    private void LateUpdate()
     {
         MonitorRound();
     }
@@ -38,7 +36,20 @@ public class RoundManager : MonoBehaviour
             GAinst.killCount = 0;
             EndRound();
         }
+        if (!roundActive)
+        {
+            elapsedTime += Time.deltaTime;
+
+            if (elapsedTime > targetTime)
+            {
+                roundActive = true;
+                elapsedTime = 0;
+                targetTime = 0;
+            }
+        }
     }
+
+
     public void EndRound( bool playerHit = false)
     {
         print("Round over");
@@ -61,5 +72,9 @@ public class RoundManager : MonoBehaviour
         }
         GAinst.ResetPlayerAI();
         currentRound++;
+        if (playerHit)
+            targetTime = deathTimer;
+        else
+            targetTime = waveTimer;
     }
 }

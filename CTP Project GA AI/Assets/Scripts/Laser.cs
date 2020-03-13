@@ -9,6 +9,7 @@ public class Laser : Bullet
     {
         if (inUse)
         {
+            KillOnRoundEnd();
             GetComponent<Rigidbody2D>().velocity = new Vector2(0, -1) * speed;
         }
     }

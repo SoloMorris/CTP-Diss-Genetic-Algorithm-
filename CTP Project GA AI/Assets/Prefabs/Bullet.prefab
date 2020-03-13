@@ -94,11 +94,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a27a48dd0335df24cbda62b0fcfafe12, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 10
+  speed: 7
   inUse: 0
   player: {fileID: 0}
   hitAlien: 0
   miss: 0
+  bulletsCollide: 0
 --- !u!50 &8656924238259196375
 Rigidbody2D:
   serializedVersion: 4

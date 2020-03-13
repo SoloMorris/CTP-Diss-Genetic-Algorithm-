@@ -18,11 +18,11 @@ public class Bullet : MonoBehaviour
     {
         myBody = GetComponent<Rigidbody2D>();
     }
-
     private void FixedUpdate()
     {
         if (inUse)
         {
+            KillOnRoundEnd();
             myBody.velocity = new Vector2(0, 1) * speed;
         }
     }
@@ -47,6 +47,15 @@ public class Bullet : MonoBehaviour
         
     }
 
+    protected bool KillOnRoundEnd()
+    {
+        if (!RoundManager.instance.roundActive)
+        {
+            ResetBullet();
+            return true;
+        }
+        return false;
+    }
     virtual public void ResetBullet()
     {
         transform.position = startPosition;

@@ -17,7 +17,7 @@ public class GeneticAlien : MonoBehaviour
     [SerializeField] int alienCap;
     [SerializeField] GameObject alienPrefab;
 
-    public bool roundActive = true;
+    public bool roundActive;
 
     //Size scaling
     [SerializeField] Vector3 alienSizeMin;
@@ -122,6 +122,7 @@ public class GeneticAlien : MonoBehaviour
 
     void Update()
     {
+        roundActive = RoundManager.instance.roundActive;
         elapsedTime += Time.deltaTime;
         if (roundActive)
         {
@@ -137,12 +138,7 @@ public class GeneticAlien : MonoBehaviour
         {
             //difficultyText.text = ("That wave's effectiveness was " + FindDifficulty().ToString() + ".");
             //difficultyText.enabled = true;
-            if (elapsedTime > 0.5f)
-            {
-
-                roundActive = true;
-                elapsedTime = 0;
-            }
+            
         }
     }
 
