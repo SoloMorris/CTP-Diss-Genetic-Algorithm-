@@ -265,6 +265,70 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 136321853}
   m_CullTransparentMesh: 0
+--- !u!1 &219588399
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 219588400}
+  m_Layer: 0
+  m_Name: AlienSpawns
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &219588400
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 219588399}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 1.8416373, y: 4.394049, z: 6.2290406}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children:
+  - {fileID: 1221053444}
+  - {fileID: 2013692678}
+  - {fileID: 2059874274}
+  - {fileID: 237745481}
+  m_Father: {fileID: 0}
+  m_RootOrder: 4
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &237745480
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 237745481}
+  m_Layer: 0
+  m_Name: AlienSpawn4
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &237745481
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 237745480}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 2, y: -0.2, z: -6.2290406}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 219588400}
+  m_RootOrder: 3
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &278707222
 GameObject:
   m_ObjectHideFlags: 0
@@ -403,6 +467,7 @@ GameObject:
   m_Component:
   - component: {fileID: 464725983}
   - component: {fileID: 464725982}
+  - component: {fileID: 464725985}
   - component: {fileID: 464725984}
   m_Layer: 0
   m_Name: GameManager
@@ -428,6 +493,7 @@ MonoBehaviour:
   misses: 0
   shotAccuracy: 0
   levelTime: 0
+  round: 0
 --- !u!4 &464725983
 Transform:
   m_ObjectHideFlags: 0
@@ -454,8 +520,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 43cbb375350d52a43b87727a4a054920, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  round: 0
   player: {fileID: 1015322091}
-  spawnPoint: {fileID: 1221053443}
+  spawnPoints:
+  - {fileID: 1221053443}
+  - {fileID: 2013692677}
+  - {fileID: 2059874273}
+  - {fileID: 237745480}
   laserPrefab: {fileID: 8656924238259196373, guid: 263ba90eb9ac945459474fddf70fa1aa,
     type: 3}
   aliens: []
@@ -463,24 +534,42 @@ MonoBehaviour:
   alienPrefab: {fileID: 8507743348036591844, guid: a1bbf56636430ca4fa49492e1e801d89,
     type: 3}
   roundActive: 0
-  alienSizeMin: {x: 1, y: 0.5, z: 1}
-  alienSizeMax: {x: 1, y: 0.5, z: 1}
+  alienSizeMin: {x: 0.65, y: 0.35, z: 1}
+  alienSizeMax: {x: 0.65, y: 0.45, z: 1}
   wall1: {fileID: 1724652864}
   wall2: {fileID: 822343512}
+  ga: {fileID: 0}
   difficultyText: {fileID: 136321855}
-  waveSize: 10
+  killCount: 0
   mutationRate: 0.0527
-  allowedMoves: 35
-  validMoves: 000000000100000002000000
+  allowedMoves: 50
   targetTimeAlive: 8
   bestFitnessMoves: 
   targetY: {x: 0, y: -4, z: 0}
   aliensKeptPerGeneration: 0
   elapsedTime: 0
   tickRate: 0.35
-  horizontalMovementRate: 1
+  horizontalMovementRate: 0.5
   verticalMovementTimer: 0
   verticalMovementRate: 0.035
+--- !u!114 &464725985
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 464725981}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c36507574bfcc8b4496a4db034226574, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  currentRound: 0
+  roundActive: 0
+  roundLength: 10
+  difficulty: 0
+  deathTimer: 3
+  waveTimer: 0.1
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0
@@ -517,7 +606,7 @@ Camera:
   m_Enabled: 1
   serializedVersion: 2
   m_ClearFlags: 2
-  m_BackGroundColor: {r: 0.19215687, g: 0.3019608, b: 0.4745098, a: 0}
+  m_BackGroundColor: {r: 0, g: 0, b: 0, a: 0}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0
@@ -664,7 +753,7 @@ Transform:
   m_GameObject: {fileID: 608906831}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 11.717362, y: 0.95233154, z: -22.917528}
-  m_LocalScale: {x: 16.763, y: 1.7585781, z: 1}
+  m_LocalScale: {x: 18.863405, y: 1.7585781, z: 1}
   m_Children: []
   m_Father: {fileID: 323683363}
   m_RootOrder: 4
@@ -768,7 +857,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 822343512}
   m_LocalRotation: {x: -0, y: -0, z: 0.7071068, w: 0.7071068}
-  m_LocalPosition: {x: 20.04, y: -5.16, z: -22.917528}
+  m_LocalPosition: {x: 22.48, y: -5.16, z: -22.917528}
   m_LocalScale: {x: 16.763008, y: 3.8914, z: 1}
   m_Children: []
   m_Father: {fileID: 323683363}
@@ -963,7 +1052,7 @@ Transform:
   m_GameObject: {fileID: 1015322091}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: -4.4, z: 0}
-  m_LocalScale: {x: 1.0196368, y: 0.45, z: 1}
+  m_LocalScale: {x: 0.45, y: 0.45, z: 1}
   m_Children:
   - {fileID: 278707223}
   m_Father: {fileID: 0}
@@ -981,9 +1070,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 983ce8f6e8c2040498f874c2650febcf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveSpeed: 6
+  moveSpeed: 9
   bullet: {fileID: 8656924238259196373, guid: 03a126b7ed230064697e3b5a861b7ece, type: 3}
-  automatePlayerMovement: 1
+  automatePlayerMovement: 0
+  fireTimer: 0
 --- !u!61 &1015322097
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -1020,7 +1110,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1221053444}
   m_Layer: 0
-  m_Name: AlienSpawn
+  m_Name: AlienSpawn1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1033,12 +1123,12 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1221053443}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 4, z: 0}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -7, y: -0.2, z: -6.2290406}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: 4
+  m_Father: {fileID: 219588400}
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1226233746
 GameObject:
@@ -1169,7 +1259,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1724652864}
   m_LocalRotation: {x: -0, y: -0, z: 0.7071068, w: 0.7071068}
-  m_LocalPosition: {x: 3.82, y: -5.16, z: -22.917528}
+  m_LocalPosition: {x: 1.36, y: -5.16, z: -22.917528}
   m_LocalScale: {x: 16.763008, y: 3.0316, z: 1}
   m_Children: []
   m_Father: {fileID: 323683363}
@@ -1275,10 +1365,70 @@ Transform:
   m_GameObject: {fileID: 1936827146}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 11.707362, y: -11.41, z: -22.917528}
-  m_LocalScale: {x: 16.763, y: 2.9639606, z: 1}
+  m_LocalScale: {x: 20.935312, y: 2.9639606, z: 1}
   m_Children: []
   m_Father: {fileID: 323683363}
   m_RootOrder: 1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &2013692677
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2013692678}
+  m_Layer: 0
+  m_Name: AlienSpawn2
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2013692678
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2013692677}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -4, y: 0.2, z: -6.2290406}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 219588400}
+  m_RootOrder: 1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &2059874273
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2059874274}
+  m_Layer: 0
+  m_Name: AlienSpawn3
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2059874274
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2059874273}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -1, y: -0.2, z: -6.2290406}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 219588400}
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2134635387
 GameObject:

@@ -10,7 +10,7 @@ public class GeneticAlien : MonoBehaviour
     public int round = 0;
     [SerializeField] GameObject player;
     public static GeneticAlien _instance;
-    [SerializeField] GameObject spawnPoint;
+    [SerializeField] GameObject[] spawnPoints = new GameObject[4];
     [SerializeField] GameObject laserPrefab;
 
     [SerializeField] private List<GameObject> aliens = new List<GameObject>();
@@ -34,9 +34,7 @@ public class GeneticAlien : MonoBehaviour
     private System.Random random;
     private float difficulty = 0;
     [SerializeField] private Text difficultyText;
-    
-    [Range(0, 30)] public int waveSize = 10;
-    
+        
     public int killCount = 0;
     [SerializeField] [Range(0.01f, 0.1f)] float mutationRate = 0.02f;
     [SerializeField] int allowedMoves = 50;
@@ -95,11 +93,13 @@ public class GeneticAlien : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        var waveSize = RoundManager.instance.roundLength;
+
         difficultyText.enabled = false;
         random = new System.Random();
         ga = new GeneticAlgorithm(waveSize, allowedMoves, random, GetRandomMovementDirection, FitnessFunction, aliensKeptPerGeneration, mutationRate);
         
-        for (int i = 0; i < waveSize; i++)
+        for (int i = 0; i < (waveSize); i++)
         {
             var newAlien = Instantiate(alienPrefab);
             var alienBrain = newAlien.GetComponent<Alien>();
@@ -126,9 +126,12 @@ public class GeneticAlien : MonoBehaviour
         elapsedTime += Time.deltaTime;
         if (roundActive)
         {
-           if (!CheckPlayerTargetValid())
+            if (player.GetComponent<PlayerController>().automatePlayerMovement)
             {
-                print("Could not find player's target!");
+                if (!CheckPlayerTargetValid())
+                {
+                    print("Could not find player's target!");
+                }
             }
             difficultyText.enabled = false;
             CheckIfAliensKilled();
@@ -185,6 +188,7 @@ public class GeneticAlien : MonoBehaviour
                                 (pos.x + horizontalMovementRate), pos.y, pos.z);
                             break;
                         case 3:
+                            if (UnityEngine.Random.Range(1,10) > 5)
                             aliens[i].GetComponent<Alien>().FireLaser();
                             break;
                     }
@@ -195,10 +199,14 @@ public class GeneticAlien : MonoBehaviour
             var alienID = FindAlienInList();
             if (alienID >= 0)
             {
-                aliens[alienID].GetComponent<Alien>().instance.transform.position = spawnPoint.transform.position;
-                aliens[alienID].GetComponent<Alien>().alive = true;
-                aliens[alienID].GetComponent<Alien>().instance.gameObject.SetActive(true);
-                aliens[alienID].GetComponent<Alien>().instance.gameObject.transform.localScale = new Vector3(
+                var alien = aliens[alienID].GetComponent<Alien>();
+
+                //Spawn the aliens at a position based on their genes
+                alien.instance.transform.position = spawnPoints[ga.population[alienID].genes[0]].transform.position;
+
+                alien.alive = true;
+                alien.instance.gameObject.SetActive(true);
+                alien.instance.gameObject.transform.localScale = new Vector3(
                     UnityEngine.Random.Range(alienSizeMin.x, alienSizeMax.x),
                     UnityEngine.Random.Range(alienSizeMin.y, alienSizeMax.y),
                     UnityEngine.Random.Range(alienSizeMin.z, alienSizeMax.z));
@@ -252,11 +260,11 @@ public class GeneticAlien : MonoBehaviour
         {
             score += Vector3.Distance(ga.population[index].Owner.
                 instance.GetComponent<AlienController>().deathPosition, 
-                spawnPoint.transform.position);
+                new Vector3(0,-0.2f));
 
             score /= Vector3.Distance(ga.population[index].Owner.
                 instance.GetComponent<AlienController>().deathPosition, 
-                new Vector3(0,-4,0));
+                new Vector3(0,-4));
         }
         print("Score" + score +" for alien " +ga.population[index].Owner.instance.GetComponent<AlienController>().uid);
         return score;

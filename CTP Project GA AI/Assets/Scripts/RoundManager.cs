@@ -5,11 +5,15 @@ using UnityEngine;
 public class RoundManager : MonoBehaviour
 {
     public static RoundManager instance;
+
+    //Alien/Wave management
     public int currentRound;
     public bool roundActive = false;
     int epochs = 5;
+    [Range(1,100)] public int roundLength;
     int roundSet;
 
+    //Round timers
     public float difficulty;
     public float deathTimer = 3.0f;
     public float waveTimer = 0.1f;
@@ -20,6 +24,8 @@ public class RoundManager : MonoBehaviour
     private void Awake()
     {
         if (instance == null) instance = this;
+        Physics2D.IgnoreLayerCollision(8, 8);
+        Physics2D.IgnoreLayerCollision(0, 8);
     }
     private void LateUpdate()
     {
@@ -34,7 +40,7 @@ public class RoundManager : MonoBehaviour
     private void MonitorRound()
     {
         var GAinst = GeneticAlien._instance;
-        if (GAinst.killCount > GAinst.waveSize)
+        if (GAinst.killCount > (roundLength / 2))
         {
             GAinst.killCount = 0;
             EndRound();
@@ -52,11 +58,9 @@ public class RoundManager : MonoBehaviour
         }
     }
 
-
     public void EndRound( bool playerHit = false)
     {
         print("Round over");
-        roundActive = false;
 
         var GAinst = GeneticAlien._instance;
         var alienlist = GAinst.GetAlienList();
@@ -67,9 +71,9 @@ public class RoundManager : MonoBehaviour
         {
             alienlist[i].GetComponent<GeneticAlien.Alien>().instance.GetComponent<AlienController>().killed = false;
         }
-            GAinst.ga.CreateNewGeneration();
         if (roundSet == epochs)
         {
+            GAinst.ga.CreateNewGeneration();
             //Save the current ga as a JSON file.
             roundSet = 0;
         }
@@ -83,8 +87,13 @@ public class RoundManager : MonoBehaviour
         GAinst.ResetPlayerAI();
         currentRound++;
         if (playerHit)
+        {
+            roundActive = false;
             targetTime = deathTimer;
+        }
         else
+        {
             targetTime = waveTimer;
+        }
     }
 }

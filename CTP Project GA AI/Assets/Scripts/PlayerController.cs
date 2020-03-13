@@ -6,23 +6,22 @@ public class PlayerController : MonoBehaviour
 {
     Rigidbody2D player;
 
-    [SerializeField] [Range(0, 10)] private float moveSpeed = 8;
+    [SerializeField] [Range(0, 20)] private float moveSpeed = 8;
 
     float horizontalInput;
-    bool shootInput;
+    bool shootInput = false;
     [SerializeField] private GameObject bullet;
     private List<GameObject> bullets = new List<GameObject>();
-    [SerializeField] private bool automatePlayerMovement;
+    [SerializeField] public bool automatePlayerMovement;
 
     private GeneticAlien.Alien target = new GeneticAlien.Alien();
 
-    float fireTimer = 0.0f;
+    public float fireTimer = 0.0f;
 
     // Start is called before the first frame update
     void Start()
     {
         player = GetComponent<Rigidbody2D>();
-        horizontalInput = Input.GetAxisRaw("Horizontal");
 
         for (int i = 0; i < 1; i++)
         {
@@ -37,13 +36,16 @@ public class PlayerController : MonoBehaviour
 
     private void Update()
     {
-        fireTimer += Time.deltaTime;
         horizontalInput = Input.GetAxisRaw("Horizontal");
         shootInput = Input.GetButtonDown("Jump");
+        if (shootInput)
+            Fire();
 
-
-        if (automatePlayerMovement && GeneticAlien._instance.roundActive) 
+        if (automatePlayerMovement && GeneticAlien._instance.roundActive)
+        {
             AIControlPlayer();
+            fireTimer += Time.deltaTime;
+        }
     }
 
     void FixedUpdate()
@@ -63,6 +65,7 @@ public class PlayerController : MonoBehaviour
     {
         if (shootInput)
         {
+            print("got shoot input");
             var currentBullet = FindAvailableBullet();
             if (currentBullet >= 0)
             {
@@ -78,9 +81,11 @@ public class PlayerController : MonoBehaviour
         {
             if (!bullets[i].GetComponent<Bullet>().inUse)
             {
+                print("found bullet");
                 return i;
             }
         }
+        print("didnt find bullet");
         return -1;
     }
 

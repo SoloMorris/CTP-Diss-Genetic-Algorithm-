@@ -56,11 +56,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 87110352b66d8ae45ae13ac884356883, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 7.5
+  speed: 3
   inUse: 0
   player: {fileID: 0}
   hitAlien: 0
   miss: 0
+  bulletsCollide: 0
   hitPlayer: 0
 --- !u!23 &8656924238259196368
 MeshRenderer:
