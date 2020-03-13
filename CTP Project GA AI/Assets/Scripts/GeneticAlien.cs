@@ -30,14 +30,14 @@ public class GeneticAlien : MonoBehaviour
     //Variables for algorithm
     [Header("Algorithm")]
     //Algorithm
-    private GeneticAlgorithm ga;
+    public GeneticAlgorithm ga;
     private System.Random random;
     private float difficulty = 0;
     [SerializeField] private Text difficultyText;
     
-    [SerializeField] [Range(0, 30)]  int waveSize = 10;
+    [Range(0, 30)] public int waveSize = 10;
     
-    private int killCount = 0;
+    public int killCount = 0;
     [SerializeField] [Range(0.01f, 0.1f)] float mutationRate = 0.02f;
     [SerializeField] int allowedMoves = 50;
     int[] validMoves = new int[4];
@@ -162,12 +162,6 @@ public class GeneticAlien : MonoBehaviour
 
             }
         }
-
-        if (killCount >= waveSize)
-        {
-            killCount = 0;
-            EndRound();
-        }
     }
 
     private void SpawnAliens()
@@ -281,26 +275,9 @@ public class GeneticAlien : MonoBehaviour
         CheckIfAliensKilled();
     }
 
-    public void EndRound()
-    {
-        print("Round over");
-        roundActive = false;
-        difficulty = FindDifficulty();
-        for (int i = 0; i < aliens.Count; i++)
-        {
-            aliens[i].GetComponent<Alien>().instance.GetComponent<AlienController>().killed = false;
-        }
-        ga.CreateNewGeneration();
-        for (int i = 0; i < aliens.Count; i++)
-        {
-            aliens[i].GetComponent<Alien>().movesUsed = 0;
-            aliens[i].GetComponent<Alien>().dna = ga.population[i];
-        }
-        ResetPlayerAI();
-        round++;
-    }
+    
 
-    private float FindDifficulty()
+    public float FindDifficulty()
     {
         difficulty = 0;
         for (int i = 0; i < aliens.Count; i++)

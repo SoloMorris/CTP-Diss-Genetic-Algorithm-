@@ -22,7 +22,7 @@ public class Laser : Bullet
             {
                 GeneticAlien._instance.ResetPlayerAI();
                 GeneticAlien._instance.ResetAliens();
-                GeneticAlien._instance.EndRound();
+                RoundManager.instance.EndRound(true);
             }
         }
         //Just write a fucntion to kill the alien, retard
