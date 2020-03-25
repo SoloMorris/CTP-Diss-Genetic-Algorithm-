@@ -103,6 +103,7 @@ public class Grid : MonoBehaviour
                     gridTiles[i][j].surroundingTiles[(int)Tile.TileDir.Top] = gridTiles[i + 1][j];
 
                 }
+                //Middle Tiles
                 if (j != 0)
                     gridTiles[i][j].surroundingTiles[(int)Tile.TileDir.Left] = gridTiles[i][j - 1];
 
