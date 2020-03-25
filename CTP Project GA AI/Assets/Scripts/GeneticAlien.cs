@@ -15,7 +15,7 @@ public class GeneticAlien : MonoBehaviour
 
     [SerializeField] private List<GameObject> aliens = new List<GameObject>();
     [SerializeField] int alienCap;
-    [SerializeField] GameObject alienPrefab;
+    public GameObject alienPrefab;
 
     public bool roundActive;
 
@@ -207,7 +207,7 @@ public class GeneticAlien : MonoBehaviour
                 alien.alive = true;
                 alien.instance.gameObject.SetActive(true);
                 alien.instance.gameObject.transform.localScale = new Vector3(
-                    UnityEngine.Random.Range(alienSizeMin.x, alienSizeMax.x),
+                    alien.instance.gameObject.transform.localScale.x,
                     UnityEngine.Random.Range(alienSizeMin.y, alienSizeMax.y),
                     UnityEngine.Random.Range(alienSizeMin.z, alienSizeMax.z));
             }
@@ -316,6 +316,11 @@ public class GeneticAlien : MonoBehaviour
         }
         player.GetComponent<PlayerController>().ResetPlayerAI();
         return false;
+    }
+
+    public Vector3 GetAlienSizeMax()
+    {
+        return alienSizeMax;
     }
 }
 //aliens.Add(new Alien());

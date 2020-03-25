@@ -30,7 +30,7 @@ Transform:
   m_GameObject: {fileID: 8507743348036591844}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -5.79, y: 4.27, z: 0}
-  m_LocalScale: {x: 0.24096747, y: 0.2417355, z: 1}
+  m_LocalScale: {x: 0.35, y: 0.2417355, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
@@ -141,8 +141,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   instance: {fileID: 0}
+  laserPrefab: {fileID: 0}
   alive: 0
   distanceTraveled: 0
   speed: 0
+  id: 0
+  movesUsed: 0
+  hitPlayer: 0
+  dna: {fileID: 0}
   movingTo: 0
+  killed: 0
   uid: 0
+  deathPosition: {x: 0, y: 0, z: 0}
