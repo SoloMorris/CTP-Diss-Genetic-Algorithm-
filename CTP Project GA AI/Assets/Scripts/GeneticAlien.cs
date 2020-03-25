@@ -202,7 +202,10 @@ public class GeneticAlien : MonoBehaviour
                 var alien = aliens[alienID].GetComponent<Alien>();
 
                 //Spawn the aliens at a position based on their genes
-                alien.instance.transform.position = spawnPoints[ga.population[alienID].genes[0]].transform.position;
+                //alien.instance.transform.position = spawnPoints[ga.population[alienID].genes[0]].transform.position;
+                alien.instance.transform.position = Grid.instance.gridTiles[Grid.instance.gridTiles.Count-1][
+                    (int)UnityEngine.Random.Range(0, Grid.instance.gridTiles[0].Count)
+                    ].position;
 
                 alien.alive = true;
                 alien.instance.gameObject.SetActive(true);

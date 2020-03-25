@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class Grid : MonoBehaviour
 {
+    public static Grid instance;
     [SerializeField] private GameObject alien, leftSide, rightSide;
     int gridLength;
     int gridHeight;
@@ -11,7 +12,7 @@ public class Grid : MonoBehaviour
     private float tileHeight;
      
     private Vector2 gridArray;
-    private List<List<Tile>> gridTiles = new List<List<Tile>>();
+    public List<List<Tile>> gridTiles { get; private set; } = new List<List<Tile>>();
     public class Tile
     {
         public enum TileState
@@ -42,6 +43,10 @@ public class Grid : MonoBehaviour
         public Vector2 size;
         public Vector2 position;
         public Tile[] surroundingTiles = new Tile[8];
+    }
+    private void Awake()
+    {
+        if (instance == null) instance = this;
     }
 
     void Start()
