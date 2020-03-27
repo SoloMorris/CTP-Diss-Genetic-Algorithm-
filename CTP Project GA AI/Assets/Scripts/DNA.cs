@@ -5,15 +5,15 @@ using UnityEngine;
 
 public class DNA : MonoBehaviour
 {
-    public List<int> genes = new List<int>();
+    public List<char[]> genes = new List<char[]>();
     public float Fitness;
     [SerializeField] private int genomeLength;
     private System.Random random;
-    private Func<int> GetRandomGene;
+    private Func<char[]> GetRandomGene;
     private Func<int, float> FitnessFunction;
     public GeneticAlien.Alien Owner;
     
-    public DNA(int _genomeLength, Func<int> getRandomGene, Func<int, float> fitnessFunction, GeneticAlien.Alien owner, bool initGenes = true)
+    public DNA(int _genomeLength, Func<char[]> getRandomGene, Func<int, float> fitnessFunction, GeneticAlien.Alien owner, bool initGenes = true)
     {
         GetRandomGene = getRandomGene;
         FitnessFunction = fitnessFunction;

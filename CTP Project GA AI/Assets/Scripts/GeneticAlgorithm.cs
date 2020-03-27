@@ -14,11 +14,11 @@ public class GeneticAlgorithm : MonoBehaviour
 
     private float totalFitness = 0;
     public float bestFitness;
-    public int[] bestGenes;
+    public char[][] bestGenes;
     public int Elitism;
 
 
-    public GeneticAlgorithm(int _populationSize, int _dnaSize, System.Random _random, Func<int> _getRandomGene, Func<int, float> _fitnessFunction,
+    public GeneticAlgorithm(int _populationSize, int _dnaSize, System.Random _random, Func<char[]> _getRandomGene, Func<int, float> _fitnessFunction,
         int elitism, float _mutationRate = 0.01f)
     {
         generation = 1;
@@ -27,7 +27,7 @@ public class GeneticAlgorithm : MonoBehaviour
 
         random = _random;
 
-        bestGenes = new int[_dnaSize];
+        bestGenes = new char[_dnaSize][];
         for (int i = 0; i < _populationSize; i++)
         {
             population.Add(new DNA(_dnaSize, _getRandomGene, _fitnessFunction, null));

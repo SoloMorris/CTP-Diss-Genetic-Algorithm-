@@ -122,6 +122,7 @@ public class Grid : MonoBehaviour
     //AABB collision for tile checking, add min-max point
     //TODO ID checking for alien logic
 
+
     private void OnDrawGizmos()
     {
         for (int i = 0; i < gridTiles.Count; i++)

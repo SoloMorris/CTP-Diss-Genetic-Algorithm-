@@ -37,8 +37,7 @@ public class GeneticAlien : MonoBehaviour
         
     public int killCount = 0;
     [SerializeField] [Range(0.01f, 0.1f)] float mutationRate = 0.02f;
-    [SerializeField] int allowedMoves = 50;
-    int[] validMoves = new int[4];
+    public int allowedMoves = 50;
     [Header("Misc")]
     [SerializeField] int targetTimeAlive = 8;
     [SerializeField] int[] bestFitnessMoves;
@@ -53,6 +52,31 @@ public class GeneticAlien : MonoBehaviour
     [SerializeField] private float verticalMovementTimer = 0.0f;
     [SerializeField] private float verticalMovementRate = 0.0f;
 
+    public class GeneLogic
+    {
+        int geneLength = GeneticAlien._instance.allowedMoves;
+        public List<char[]> genes = new List<char[]>();
+        //public char[] instructions = new char[2];
+        string al = "abcdefghijklmnopqrstuvwxyz";
+        string directions = "01234567";
+        public GeneLogic()
+        {
+            for (int i = 0; i < geneLength; i++)
+            {
+                //Create new instructions, randomly initialise from the alphabet and each available direction
+                char[] instructions = new char[2];
+                while (instructions[0] != 'm' || instructions[0] != 's' || instructions[0] != 't')
+                {
+                    var inst = al[12];//al[UnityEngine.Random.Range(al[1], al.Length-5)];
+                    instructions[0] = inst;
+                }
+
+                instructions[1] = directions[UnityEngine.Random.Range(directions[0], directions.Length)];
+                genes.Add(instructions);
+            }
+        }
+
+    }
 
     public class Alien : MonoBehaviour
     {
@@ -65,6 +89,8 @@ public class GeneticAlien : MonoBehaviour
         public int movesUsed;
         public bool hitPlayer;
         public DNA dna;
+        public GeneLogic genes;
+        public Grid.Tile occupiedTile;
         public void FireLaser()
         {
             var firedLaser = Instantiate(laserPrefab);
@@ -99,6 +125,7 @@ public class GeneticAlien : MonoBehaviour
         random = new System.Random();
         ga = new GeneticAlgorithm(waveSize, allowedMoves, random, GetRandomMovementDirection, FitnessFunction, aliensKeptPerGeneration, mutationRate);
         
+        // Create new aliens, give them genes
         for (int i = 0; i < (waveSize); i++)
         {
             var newAlien = Instantiate(alienPrefab);
@@ -135,7 +162,7 @@ public class GeneticAlien : MonoBehaviour
             }
             difficultyText.enabled = false;
             CheckIfAliensKilled();
-            SpawnAliens();
+            AlienLogic();
         }
         else
         {
@@ -150,6 +177,7 @@ public class GeneticAlien : MonoBehaviour
         killCount = 0;
         for (int i = 0; i < aliens.Count; i++)
         {
+            //Disable aliens if killed
             if (aliens[i].GetComponent<Alien>().instance.GetComponent<AlienController>().killed)
             {
                 var alien = aliens[i].GetComponent<Alien>().instance.gameObject;
@@ -163,34 +191,64 @@ public class GeneticAlien : MonoBehaviour
         }
     }
 
-    private void SpawnAliens()
+    private void AlienLogic()
     {
         verticalMovementTimer += Time.deltaTime;
 
+        AlienBehaviour();
+        
+        if (verticalMovementTimer > (tickRate / 4))
+        {
+            for (int i = 0; i < aliens.Count; i++)
+            {
+                if (aliens[i].GetComponent<Alien>().alive)
+                {
+                    //aliens[i].GetComponent<Alien>().instance.transform.position = new Vector3(
+                    //aliens[i].GetComponent<Alien>().instance.transform.position.x,
+                    //(aliens[i].GetComponent<Alien>().instance.transform.position.y - verticalMovementRate),
+                    //aliens[i].GetComponent<Alien>().instance.transform.position.z);
+                    var myTile = aliens[i].GetComponent<Alien>().occupiedTile;
+                    //saliens[i].GetComponent<Alien>().occupiedTile = myTile.surroundingTiles[]; 
+                    aliens[i].transform.position = myTile.position;
+             
+                }
+            }
+            verticalMovementTimer = 0;
+        }
+    }
+
+    private void AlienBehaviour()
+    {
         if (elapsedTime > (tickRate * 2))
         {
 
             for (int i = 0; i < aliens.Count; i++)
             {
+
                 if (aliens[i].GetComponent<Alien>().alive)
                 {
+                    //Alien Logic
                     var pos = aliens[i].GetComponent<Alien>().instance.gameObject.transform.position;
-                    switch (aliens[i].GetComponent<Alien>().dna.genes[aliens[i].GetComponent<Alien>().movesUsed])
+                    //switch (aliens[i].GetComponent<Alien>().dna.genes[aliens[i].GetComponent<Alien>().movesUsed])
+                    switch (aliens[i].GetComponent<Alien>().dna.genes[aliens[i].GetComponent<Alien>().movesUsed][0])
                     {
-                        case 0:
+                        case 'm':
                             aliens[i].GetComponent<Alien>().instance.transform.position = new Vector3(
                                 (pos.x - horizontalMovementRate), pos.y, pos.z);
+                            print("YAAT");
                             break;
-                        case 1:
+                        case 's':
+                            print("YEET");
                             break;
-                        case 2:
+                        case 't':
                             aliens[i].GetComponent<Alien>().instance.transform.position = new Vector3(
                                 (pos.x + horizontalMovementRate), pos.y, pos.z);
+                            print("YOTE");
                             break;
-                        case 3:
-                            if (UnityEngine.Random.Range(1,10) > 5)
-                            aliens[i].GetComponent<Alien>().FireLaser();
-                            break;
+                        //case 3:
+                        //    if (UnityEngine.Random.Range(1, 10) > 5)
+                        //        aliens[i].GetComponent<Alien>().FireLaser();
+                        //    break;
                     }
                     aliens[i].GetComponent<Alien>().movesUsed++;
                 }
@@ -203,9 +261,10 @@ public class GeneticAlien : MonoBehaviour
 
                 //Spawn the aliens at a position based on their genes
                 //alien.instance.transform.position = spawnPoints[ga.population[alienID].genes[0]].transform.position;
-                alien.instance.transform.position = Grid.instance.gridTiles[Grid.instance.gridTiles.Count-1][
-                    (int)UnityEngine.Random.Range(0, Grid.instance.gridTiles[0].Count)
-                    ].position;
+                var startTile = Grid.instance.gridTiles[Grid.instance.gridTiles.Count - 1][
+                    (int)UnityEngine.Random.Range(0, Grid.instance.gridTiles[0].Count)];
+                alien.instance.transform.position = startTile.position;
+                alien.occupiedTile = startTile;
 
                 alien.alive = true;
                 alien.instance.gameObject.SetActive(true);
@@ -215,21 +274,6 @@ public class GeneticAlien : MonoBehaviour
                     UnityEngine.Random.Range(alienSizeMin.z, alienSizeMax.z));
             }
 
-        }
-
-        if (verticalMovementTimer > (tickRate / 4))
-        {
-            for (int i = 0; i < aliens.Count; i++)
-            {
-                if (aliens[i].GetComponent<Alien>().alive)
-                {
-                    aliens[i].GetComponent<Alien>().instance.transform.position = new Vector3(
-                                aliens[i].GetComponent<Alien>().instance.transform.position.x,
-                                (aliens[i].GetComponent<Alien>().instance.transform.position.y - verticalMovementRate),
-                                aliens[i].GetComponent<Alien>().instance.transform.position.z);
-                }
-            }
-            verticalMovementTimer = 0;
         }
     }
 
@@ -246,10 +290,13 @@ public class GeneticAlien : MonoBehaviour
         return -1;
     }
 
-    public int GetRandomMovementDirection()
+    public char[] GetRandomMovementDirection()
     {
-        var i = random.Next(validMoves.Length);
-        return i;
+        GeneLogic a = new GeneLogic();
+        char[] b = new char[2];
+        b[0] = a.genes[0][0];
+        b[1] = a.genes[0][1];
+        return b;
     }
 
     private float FitnessFunction(int index)
