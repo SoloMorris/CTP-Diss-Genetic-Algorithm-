@@ -65,13 +65,14 @@ public class GeneticAlien : MonoBehaviour
             {
                 //Create new instructions, randomly initialise from the alphabet and each available direction
                 char[] instructions = new char[2];
-                while (instructions[0] != 'm' || instructions[0] != 's' || instructions[0] != 't')
+                while (instructions[0] != 'm' && instructions[0] != 's' && instructions[0] != 't')
                 {
-                    var inst = al[12];//al[UnityEngine.Random.Range(al[1], al.Length-5)];
+                    char inst = al[UnityEngine.Random.Range(0, al.Length)];
+                    
                     instructions[0] = inst;
                 }
 
-                instructions[1] = directions[UnityEngine.Random.Range(directions[0], directions.Length)];
+                instructions[1] = directions[UnityEngine.Random.Range(0, directions.Length)];
                 genes.Add(instructions);
             }
         }
@@ -197,7 +198,7 @@ public class GeneticAlien : MonoBehaviour
 
         AlienBehaviour();
         
-        if (verticalMovementTimer > (tickRate / 4))
+        if (verticalMovementTimer > (tickRate / 2))
         {
             for (int i = 0; i < aliens.Count; i++)
             {

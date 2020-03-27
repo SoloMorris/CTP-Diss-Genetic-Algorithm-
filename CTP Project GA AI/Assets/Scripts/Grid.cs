@@ -69,7 +69,6 @@ public class Grid : MonoBehaviour
                 _tile.position = offset;
                 _tile.id = id;
                 tempList.Add(_tile);
-                print(offset);
                 id++;
                 offset.x += tileWidth;
             }
