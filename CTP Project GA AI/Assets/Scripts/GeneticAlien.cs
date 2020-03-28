@@ -55,7 +55,7 @@ public class GeneticAlien : MonoBehaviour
     public class GeneLogic
     {
         int geneLength = GeneticAlien._instance.allowedMoves;
-        public List<char[]> genes = new List<char[]>();
+        public List<char[]> geneList = new List<char[]>();
         //public char[] instructions = new char[2];
         string al = "abcdefghijklmnopqrstuvwxyz";
         string directions = "01234567";
@@ -65,7 +65,7 @@ public class GeneticAlien : MonoBehaviour
             {
                 //Create new instructions, randomly initialise from the alphabet and each available direction
                 char[] instructions = new char[2];
-                while (instructions[0] != 'm' && instructions[0] != 's' && instructions[0] != 't')
+                while (instructions[0] != 'm') //&& instructions[0] != 's' && instructions[0] != 't')
                 {
                     char inst = al[UnityEngine.Random.Range(0, al.Length)];
                     
@@ -73,7 +73,7 @@ public class GeneticAlien : MonoBehaviour
                 }
 
                 instructions[1] = directions[UnityEngine.Random.Range(0, directions.Length)];
-                genes.Add(instructions);
+                geneList.Add(instructions);
             }
         }
 
@@ -220,7 +220,7 @@ public class GeneticAlien : MonoBehaviour
 
     private void AlienBehaviour()
     {
-        if (elapsedTime > (tickRate * 2))
+        if (elapsedTime > (tickRate * 4))
         {
 
             for (int i = 0; i < aliens.Count; i++)
@@ -234,8 +234,7 @@ public class GeneticAlien : MonoBehaviour
                     switch (aliens[i].GetComponent<Alien>().dna.genes[aliens[i].GetComponent<Alien>().movesUsed][0])
                     {
                         case 'm':
-                            aliens[i].GetComponent<Alien>().instance.transform.position = new Vector3(
-                                (pos.x - horizontalMovementRate), pos.y, pos.z);
+                            ExecuteBehaviour('m', i);
                             print("YAAT");
                             break;
                         case 's':
@@ -278,6 +277,22 @@ public class GeneticAlien : MonoBehaviour
         }
     }
 
+    private void ExecuteBehaviour(char _gene, int _index)
+    {
+        if (_gene == 'm')
+        {
+            var alien = aliens[_index].GetComponent<Alien>();
+
+            char targetTile = aliens[_index].GetComponent<Alien>().dna.genes[alien.movesUsed][1];
+            var targetIndex = (int)char.GetNumericValue(targetTile);
+            if (alien.occupiedTile.surroundingTiles[targetIndex] == null)
+                return;
+
+            var tileIWant = alien.occupiedTile.surroundingTiles[targetIndex];
+            alien.occupiedTile = tileIWant;
+        }
+    }
+
     public int FindAlienInList()
     {
         for (int i = 0; i < aliens.Count; i++)
@@ -295,8 +310,8 @@ public class GeneticAlien : MonoBehaviour
     {
         GeneLogic a = new GeneLogic();
         char[] b = new char[2];
-        b[0] = a.genes[0][0];
-        b[1] = a.genes[0][1];
+        b[0] = a.geneList[0][0];
+        b[1] = a.geneList[0][1];
         return b;
     }
 
@@ -373,6 +388,7 @@ public class GeneticAlien : MonoBehaviour
     {
         return alienSizeMax;
     }
+  
 }
 //aliens.Add(new Alien());
 //            aliens[i].instance = Instantiate(alienPrefab);

@@ -61,7 +61,7 @@ public class Grid : MonoBehaviour
         for (int i = 0; i < 21; i++)
         {
             List<Tile> tempList = new List<Tile>();
-            for (int j = 0; j < 42; j++)
+            for (int j = 0; j < 28; j++)
             {
                 
                 Tile _tile = new Tile();
