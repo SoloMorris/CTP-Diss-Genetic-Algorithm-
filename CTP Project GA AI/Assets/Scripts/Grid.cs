@@ -56,12 +56,13 @@ public class Grid : MonoBehaviour
         tileHeight = GeneticAlien._instance.GetAlienSizeMax().y;
 
         //Fix this, it triggers lewis
-        Vector3 offset = new Vector3(-8,-4.5f,0);
+        Vector3 defaultPosition = (leftSide.transform.position + new Vector3(2.1f, 0.25f));
+        Vector3 offset = defaultPosition;
         int id = 0;
-        for (int i = 0; i < 21; i++)
+        for (int i = 0; i < 20; i++)
         {
             List<Tile> tempList = new List<Tile>();
-            for (int j = 0; j < 28; j++)
+            for (int j = 0; j < 26; j++)
             {
                 
                 Tile _tile = new Tile();
@@ -70,12 +71,12 @@ public class Grid : MonoBehaviour
                 _tile.id = id;
                 tempList.Add(_tile);
                 id++;
-                offset.x += tileWidth;
+                offset.x += tileWidth * 1.1f;
             }
             gridTiles.Add(tempList);
 
-            offset.y += tileHeight;
-            offset.x = -8.0f;
+            offset.y += tileHeight * 1.1f;
+            offset.x = defaultPosition.x;
         }
 
         //Initialise tile checking

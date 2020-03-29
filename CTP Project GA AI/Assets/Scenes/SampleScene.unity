@@ -549,10 +549,8 @@ MonoBehaviour:
   targetY: {x: 0, y: -4, z: 0}
   aliensKeptPerGeneration: 0
   elapsedTime: 0
-  tickRate: 0.35
-  horizontalMovementRate: 0.5
-  verticalMovementTimer: 0
-  verticalMovementRate: 0.035
+  alienTickRate: 1
+  alienMovementTimer: 0
 --- !u!114 &464725985
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -873,8 +871,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 822343512}
   m_LocalRotation: {x: -0, y: -0, z: 0.7071068, w: 0.7071068}
-  m_LocalPosition: {x: 22.48, y: -5.16, z: -22.917528}
-  m_LocalScale: {x: 16.763008, y: 3.8914, z: 1}
+  m_LocalPosition: {x: 22.48, y: -10, z: -22.917528}
+  m_LocalScale: {x: 30, y: 3.8914, z: 1}
   m_Children: []
   m_Father: {fileID: 323683363}
   m_RootOrder: 3
@@ -1275,8 +1273,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1724652864}
   m_LocalRotation: {x: -0, y: -0, z: 0.7071068, w: 0.7071068}
-  m_LocalPosition: {x: 1.36, y: -5.16, z: -22.917528}
-  m_LocalScale: {x: 16.763008, y: 3.0316, z: 1}
+  m_LocalPosition: {x: 1.36, y: -10, z: -22.917528}
+  m_LocalScale: {x: 30, y: 3.0316, z: 1}
   m_Children: []
   m_Father: {fileID: 323683363}
   m_RootOrder: 2

@@ -37,7 +37,8 @@ public class GeneticAlien : MonoBehaviour
         
     public int killCount = 0;
     [SerializeField] [Range(0.01f, 0.1f)] float mutationRate = 0.02f;
-    public int allowedMoves = 50;
+    public int allowedMoves = 1000;
+
     [Header("Misc")]
     [SerializeField] int targetTimeAlive = 8;
     [SerializeField] int[] bestFitnessMoves;
@@ -47,10 +48,8 @@ public class GeneticAlien : MonoBehaviour
     //Alien spawning and tickrate
     [Header("Movement and tickrate")]
     [SerializeField] private float elapsedTime = 0.0f;
-    [SerializeField] private float tickRate = 0.0f;
-    [SerializeField] private float horizontalMovementRate = 0.0f;
-    [SerializeField] private float verticalMovementTimer = 0.0f;
-    [SerializeField] private float verticalMovementRate = 0.0f;
+    [SerializeField] private float alienTickRate = 0.0f;
+    [SerializeField] private float alienMovementTimer = 0.0f;
 
     public class GeneLogic
     {
@@ -194,11 +193,11 @@ public class GeneticAlien : MonoBehaviour
 
     private void AlienLogic()
     {
-        verticalMovementTimer += Time.deltaTime;
+        alienMovementTimer += Time.deltaTime;
 
         AlienBehaviour();
         
-        if (verticalMovementTimer > (tickRate / 2))
+        if (alienMovementTimer > (alienTickRate / 2))
         {
             for (int i = 0; i < aliens.Count; i++)
             {
@@ -211,16 +210,17 @@ public class GeneticAlien : MonoBehaviour
                     var myTile = aliens[i].GetComponent<Alien>().occupiedTile;
                     //saliens[i].GetComponent<Alien>().occupiedTile = myTile.surroundingTiles[]; 
                     aliens[i].transform.position = myTile.position;
+                    aliens[i].GetComponent<Alien>().occupiedTile.currentTileState = Grid.Tile.TileState.OccupiedByAlien;
              
                 }
             }
-            verticalMovementTimer = 0;
+            alienMovementTimer = 0;
         }
     }
 
     private void AlienBehaviour()
     {
-        if (elapsedTime > (tickRate * 4))
+        if (elapsedTime > (alienTickRate))
         {
 
             for (int i = 0; i < aliens.Count; i++)
@@ -241,8 +241,6 @@ public class GeneticAlien : MonoBehaviour
                             print("YEET");
                             break;
                         case 't':
-                            aliens[i].GetComponent<Alien>().instance.transform.position = new Vector3(
-                                (pos.x + horizontalMovementRate), pos.y, pos.z);
                             print("YOTE");
                             break;
                         //case 3:
@@ -284,12 +282,29 @@ public class GeneticAlien : MonoBehaviour
             var alien = aliens[_index].GetComponent<Alien>();
 
             char targetTile = aliens[_index].GetComponent<Alien>().dna.genes[alien.movesUsed][1];
-            var targetIndex = (int)char.GetNumericValue(targetTile);
-            if (alien.occupiedTile.surroundingTiles[targetIndex] == null)
-                return;
+            var tIndex = (int)char.GetNumericValue(targetTile); //index of the target tile converted to int from char
 
-            var tileIWant = alien.occupiedTile.surroundingTiles[targetIndex];
+            //  Check if the target tile doesn't exist or isn't empty before moving there
+            if (alien.occupiedTile.surroundingTiles[tIndex] == null ||
+                alien.occupiedTile.surroundingTiles[tIndex].currentTileState != Grid.Tile.TileState.Empty)
+            {
+                alien.movesUsed++;
+                ExecuteBehaviour(_gene, _index);
+                return;
+            }
+
+            // TODO : Make a system where alien "looks at" tile, then at end of update all 
+            //  aliens look to see if their target is also being targeted by another alien.
+            //  If it is, then run through their logic again. So that aliens stop ending up on the same tile at the same time.
+
+            var tileIWant = alien.occupiedTile.surroundingTiles[tIndex];
+
+            alien.occupiedTile.currentTileState = Grid.Tile.TileState.Empty;
             alien.occupiedTile = tileIWant;
+        }
+        else if (_gene == 's')
+        {
+
         }
     }
 
