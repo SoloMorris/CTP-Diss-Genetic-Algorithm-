@@ -23,7 +23,7 @@ public class PlayerController : MonoBehaviour
     {
         player = GetComponent<Rigidbody2D>();
 
-        for (int i = 0; i < 1; i++)
+        for (int i = 0; i < 2; i++)
         {
             bullets.Add(bullet);
             bullets[i] = Instantiate(bullet);

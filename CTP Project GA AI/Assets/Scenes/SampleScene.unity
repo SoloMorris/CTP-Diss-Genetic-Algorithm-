@@ -531,6 +531,7 @@ MonoBehaviour:
   laserPrefab: {fileID: 8656924238259196373, guid: 263ba90eb9ac945459474fddf70fa1aa,
     type: 3}
   aliens: []
+  activeAliens: []
   alienCap: 50
   alienPrefab: {fileID: 8507743348036591844, guid: a1bbf56636430ca4fa49492e1e801d89,
     type: 3}
@@ -543,7 +544,7 @@ MonoBehaviour:
   difficultyText: {fileID: 136321855}
   killCount: 0
   mutationRate: 0.0527
-  allowedMoves: 50
+  allowedMoves: 200
   targetTimeAlive: 8
   bestFitnessMoves: 
   targetY: {x: 0, y: -4, z: 0}

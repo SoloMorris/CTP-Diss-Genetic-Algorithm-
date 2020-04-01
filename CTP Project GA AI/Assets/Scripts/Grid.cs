@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEditor;
 
 public class Grid : MonoBehaviour
 {
@@ -21,7 +22,8 @@ public class Grid : MonoBehaviour
             OccupiedByBullet = 1,
             OccupiedByAlien = 2,
             OccupiedByAlienLaser = 3,
-            TargetedByAlien = 4
+            TargetedByAlien = 4,
+            OccupiedByPlayer = 5
         }
 
         public TileState currentTileState = TileState.Empty;
@@ -56,7 +58,8 @@ public class Grid : MonoBehaviour
         tileHeight = GeneticAlien._instance.GetAlienSizeMax().y;
 
         //Fix this, it triggers lewis
-        Vector3 defaultPosition = (leftSide.transform.position + new Vector3(2.1f, 0.25f));
+        Vector3 defaultPosition = (new Vector3(transform.TransformPoint(-rightSide.transform.position).x + 5.1f
+            , -4.8f, 0));
         Vector3 offset = defaultPosition;
         int id = 0;
         for (int i = 0; i < 20; i++)
@@ -114,14 +117,11 @@ public class Grid : MonoBehaviour
 
                 if (j < gridTiles[i].Count - 1)
                     gridTiles[i][j].surroundingTiles[(int)Tile.TileDir.Right] = gridTiles[i][j + 1];
-
             }
         }
-
     }
     //AABB collision for tile checking, add min-max point
     //TODO ID checking for alien logic
-
 
     private void OnDrawGizmos()
     {
@@ -129,7 +129,47 @@ public class Grid : MonoBehaviour
         {
             for (int j = 0; j < gridTiles[i].Count; j++)
             {
-                Gizmos.DrawCube(gridTiles[i][j].position, gridTiles[i][j].size);
+                //Gizmos.DrawCube(gridTiles[i][j].position, gridTiles[i][j].size);
+                var pos = new Vector3(gridTiles[i][j].position.x, 
+                    gridTiles[i][j].position.y,
+                    0);
+                var cubeSize = gridTiles[0][0].size.x;
+                switch (gridTiles[i][j].currentTileState)
+                { 
+                    case Tile.TileState.Empty:
+                        Handles.color = Color.blue;
+                        Handles.CubeHandleCap(0, pos, 
+                            Quaternion.LookRotation(Vector3.forward,Vector3.up), cubeSize, EventType.Repaint);
+                        Handles.Label(pos, "E");
+                        break;
+                    case Tile.TileState.OccupiedByBullet:
+                        Handles.color = Color.yellow;
+                        Handles.CubeHandleCap(0, pos,
+                            Quaternion.LookRotation(Vector3.forward, Vector3.up), cubeSize, EventType.Repaint);
+                        Handles.Label(pos, "O-B");
+                        break;
+                    case Tile.TileState.OccupiedByAlien:
+                        Handles.color = Color.red;
+                        Handles.CubeHandleCap(0, pos,
+                            Quaternion.LookRotation(Vector3.forward, Vector3.up), cubeSize, EventType.Repaint);
+                        Handles.Label(pos, "O-A");
+                        break;
+                    case Tile.TileState.OccupiedByAlienLaser:
+                        Handles.color = Color.yellow;
+                        Handles.CubeHandleCap(0, pos,
+                            Quaternion.LookRotation(Vector3.forward, Vector3.up), cubeSize, EventType.Repaint);
+                        Handles.Label(pos, "O-AL");
+                        break;
+                    case Tile.TileState.TargetedByAlien:
+                        Handles.color = Color.green;
+                        Handles.CubeHandleCap(0, pos,
+                            Quaternion.LookRotation(Vector3.forward, Vector3.up), cubeSize, EventType.Repaint);
+                        Handles.CubeHandleCap(0, pos, new Quaternion(0,0,0,0), 1, EventType.Ignore);
+                        Handles.Label(pos, "O-A");
+                        break;
+                    default:
+                        break;
+                }
             }
         }
 

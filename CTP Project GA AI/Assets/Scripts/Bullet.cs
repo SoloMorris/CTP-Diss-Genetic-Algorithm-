@@ -40,7 +40,6 @@ public class Bullet : MonoBehaviour
 
                 hitAlienCont.deathPosition = hitAlien.instance.transform.position;
                 hitAlienCont.killed = true;
-                hitAlien.alive = false;
             }
         }
         //Just write a function to kill the alien, retard

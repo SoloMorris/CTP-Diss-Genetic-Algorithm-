@@ -67,9 +67,11 @@ public class RoundManager : MonoBehaviour
         
         difficulty = GAinst.FindDifficulty();
 
+        //  Revive all the aliens
         for (int i = 0; i < alienlist.Count; i++)
         {
             alienlist[i].GetComponent<GeneticAlien.Alien>().instance.GetComponent<AlienController>().killed = false;
+            alienlist[i].GetComponent<GeneticAlien.Alien>().instance.GetComponent<AlienController>().alive = true;
         }
         if (roundSet == epochs)
         {
