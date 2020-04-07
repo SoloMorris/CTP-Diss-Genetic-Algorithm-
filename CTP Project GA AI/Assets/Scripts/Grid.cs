@@ -7,8 +7,8 @@ public class Grid : MonoBehaviour
 {
     public static Grid instance;
     [SerializeField] private GameObject alien, leftSide, rightSide;
-    int gridLength;
-    int gridHeight;
+    public int gridLength { get; private set; } = 26 ;
+    public int gridHeight { get; private set; } = 20;
     private float tileWidth;
     private float tileHeight;
      
@@ -62,10 +62,10 @@ public class Grid : MonoBehaviour
             , -4.8f, 0));
         Vector3 offset = defaultPosition;
         int id = 0;
-        for (int i = 0; i < 20; i++)
+        for (int i = 0; i < gridHeight; i++)
         {
             List<Tile> tempList = new List<Tile>();
-            for (int j = 0; j < 26; j++)
+            for (int j = 0; j < gridLength; j++)
             {
                 
                 Tile _tile = new Tile();
@@ -134,37 +134,29 @@ public class Grid : MonoBehaviour
                     gridTiles[i][j].position.y,
                     0);
                 var cubeSize = gridTiles[0][0].size.x;
+
+                Handles.CubeHandleCap(0, pos,
+                           Quaternion.LookRotation(Vector3.forward, Vector3.up), cubeSize, EventType.Repaint);
                 switch (gridTiles[i][j].currentTileState)
                 { 
                     case Tile.TileState.Empty:
                         Handles.color = Color.blue;
-                        Handles.CubeHandleCap(0, pos, 
-                            Quaternion.LookRotation(Vector3.forward,Vector3.up), cubeSize, EventType.Repaint);
                         Handles.Label(pos, "E");
                         break;
                     case Tile.TileState.OccupiedByBullet:
                         Handles.color = Color.yellow;
-                        Handles.CubeHandleCap(0, pos,
-                            Quaternion.LookRotation(Vector3.forward, Vector3.up), cubeSize, EventType.Repaint);
                         Handles.Label(pos, "O-B");
                         break;
                     case Tile.TileState.OccupiedByAlien:
                         Handles.color = Color.red;
-                        Handles.CubeHandleCap(0, pos,
-                            Quaternion.LookRotation(Vector3.forward, Vector3.up), cubeSize, EventType.Repaint);
                         Handles.Label(pos, "O-A");
                         break;
                     case Tile.TileState.OccupiedByAlienLaser:
                         Handles.color = Color.yellow;
-                        Handles.CubeHandleCap(0, pos,
-                            Quaternion.LookRotation(Vector3.forward, Vector3.up), cubeSize, EventType.Repaint);
                         Handles.Label(pos, "O-AL");
                         break;
                     case Tile.TileState.TargetedByAlien:
                         Handles.color = Color.green;
-                        Handles.CubeHandleCap(0, pos,
-                            Quaternion.LookRotation(Vector3.forward, Vector3.up), cubeSize, EventType.Repaint);
-                        Handles.CubeHandleCap(0, pos, new Quaternion(0,0,0,0), 1, EventType.Ignore);
                         Handles.Label(pos, "O-A");
                         break;
                     default:

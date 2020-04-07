@@ -544,7 +544,7 @@ MonoBehaviour:
   difficultyText: {fileID: 136321855}
   killCount: 0
   mutationRate: 0.0527
-  allowedMoves: 200
+  allowedMoves: 250
   targetTimeAlive: 8
   bestFitnessMoves: 
   targetY: {x: 0, y: -4, z: 0}
