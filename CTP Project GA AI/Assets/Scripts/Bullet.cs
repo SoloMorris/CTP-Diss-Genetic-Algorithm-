@@ -13,6 +13,7 @@ public class Bullet : MonoBehaviour
 
     [SerializeField] protected bool bulletsCollide;
     protected Rigidbody2D myBody;
+    public Grid.Tile occupiedTile;
     // Start is called before the first frame update
     void Start()
     {
@@ -24,6 +25,7 @@ public class Bullet : MonoBehaviour
         {
             KillOnRoundEnd();
             myBody.velocity = new Vector2(0, 1) * speed;
+            Grid.instance.GetCollisionWithObject(gameObject, ref occupiedTile, Grid.Tile.TileState.OccupiedByBullet);
         }
     }
 
@@ -84,7 +86,7 @@ public class Bullet : MonoBehaviour
             ResetBullet();
             return false;
         }
-        print("Invalid shot! Fired by: " +gameObject.name);
+
         return false;
     }
 }

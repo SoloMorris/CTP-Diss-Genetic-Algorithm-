@@ -530,8 +530,9 @@ MonoBehaviour:
   - {fileID: 237745480}
   laserPrefab: {fileID: 8656924238259196373, guid: 263ba90eb9ac945459474fddf70fa1aa,
     type: 3}
-  aliens: []
+  primaryAliens: []
   activeAliens: []
+  backupAliens: []
   alienCap: 50
   alienPrefab: {fileID: 8507743348036591844, guid: a1bbf56636430ca4fa49492e1e801d89,
     type: 3}
@@ -541,6 +542,7 @@ MonoBehaviour:
   wall1: {fileID: 1724652864}
   wall2: {fileID: 822343512}
   ga: {fileID: 0}
+  gaB: {fileID: 0}
   difficultyText: {fileID: 136321855}
   killCount: 0
   mutationRate: 0.0527
@@ -1066,8 +1068,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1015322091}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -4.4, z: 0}
-  m_LocalScale: {x: 0.25, y: 0.25, z: 1}
+  m_LocalPosition: {x: 0, y: -4.27, z: 0}
+  m_LocalScale: {x: 0.25, y: 0.25, z: 4.2168}
   m_Children:
   - {fileID: 278707223}
   m_Father: {fileID: 0}
@@ -1085,10 +1087,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 983ce8f6e8c2040498f874c2650febcf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveSpeed: 9
+  moveSpeed: 7.77
   bullet: {fileID: 8656924238259196373, guid: 03a126b7ed230064697e3b5a861b7ece, type: 3}
-  automatePlayerMovement: 0
   fireTimer: 0
+  automatePlayerMovement: 0
 --- !u!61 &1015322097
 BoxCollider2D:
   m_ObjectHideFlags: 0

@@ -5,22 +5,29 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour
 {
     Rigidbody2D player;
-
     [SerializeField] [Range(0, 20)] private float moveSpeed = 8;
 
+    //  Input control
     float horizontalInput;
     bool shootInput = false;
+
+    //  Bullet control
     [SerializeField] private GameObject bullet;
     private List<GameObject> bullets = new List<GameObject>();
-    [SerializeField] public bool automatePlayerMovement;
+    public float fireTimer = 0.0f;
 
+    //  For the Agent
+    [SerializeField] public bool automatePlayerMovement;
     private GeneticAlien.Alien target = new GeneticAlien.Alien();
 
-    public float fireTimer = 0.0f;
+    //Grid
+    Grid grid;
+    public Grid.Tile occupiedTile;
 
     // Start is called before the first frame update
     void Start()
     {
+        grid = Grid.instance;
         player = GetComponent<Rigidbody2D>();
 
         for (int i = 0; i < 2; i++)
@@ -57,15 +64,14 @@ public class PlayerController : MonoBehaviour
         else if (horizontalInput != 0)
         {
             player.velocity = new Vector2(horizontalInput, 0) * moveSpeed;
+            Grid.instance.GetCollisionWithObject(gameObject, ref occupiedTile, Grid.Tile.TileState.OccupiedByPlayer);
         }
-       
     }
 
     private void Fire()
     {
         if (shootInput)
         {
-            print("got shoot input");
             var currentBullet = FindAvailableBullet();
             if (currentBullet >= 0)
             {
@@ -81,11 +87,10 @@ public class PlayerController : MonoBehaviour
         {
             if (!bullets[i].GetComponent<Bullet>().inUse)
             {
-                print("found bullet");
                 return i;
             }
         }
-        print("didnt find bullet");
+
         return -1;
     }
 

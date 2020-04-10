@@ -11,6 +11,7 @@ public class Laser : Bullet
         {
             KillOnRoundEnd();
             GetComponent<Rigidbody2D>().velocity = new Vector2(0, -1) * speed;
+            Grid.instance.GetCollisionWithObject(gameObject, ref occupiedTile, Grid.Tile.TileState.OccupiedByAlienLaser);
         }
     }
 

@@ -42,9 +42,32 @@ public class Grid : MonoBehaviour
         }
 
         public int id;
-        public Vector2 size;
-        public Vector2 position;
+        public BoundingBox boundingBox;
         public Tile[] surroundingTiles = new Tile[8];
+
+       public struct BoundingBox
+        {
+            public Vector2 position;
+            public Vector2 dimensions; //Width = x, Height = y
+            public BoundingBox(Vector2 _position, Vector2 _dimensions)
+            {
+                position = _position;
+                dimensions = _dimensions;
+            }
+
+            public bool IsColliding(GameObject _gameobject)
+            {
+                if (_gameobject.transform.position.x < (position.x + (dimensions.x / 2))
+                    && _gameobject.transform.position.x > (position.x - (dimensions.x / 2))
+                    && _gameobject.transform.position.y < (position.y + (dimensions.y / 2))
+                    && _gameobject.transform.position.y > (position.y - (dimensions.y / 2)))
+                {
+                    return true;
+                }
+                else
+                    return false;
+            }
+        }
     }
     private void Awake()
     {
@@ -69,8 +92,7 @@ public class Grid : MonoBehaviour
             {
                 
                 Tile _tile = new Tile();
-                _tile.size = new Vector2(tileWidth, tileHeight);
-                _tile.position = offset;
+                _tile.boundingBox = new Tile.BoundingBox(offset, new Vector2(tileWidth, tileHeight));
                 _tile.id = id;
                 tempList.Add(_tile);
                 id++;
@@ -120,9 +142,27 @@ public class Grid : MonoBehaviour
             }
         }
     }
-    //AABB collision for tile checking, add min-max point
     //TODO ID checking for alien logic
+    public bool GetCollisionWithObject(GameObject _object, ref Tile _occupiedTile, Tile.TileState _targetState)
+    {
+        foreach (var row in gridTiles)
+        {
+            foreach (var tile in row)
+            {
+                if (tile.boundingBox.IsColliding(_object))
+                {
+                    if (_occupiedTile != null
+                        && tile != _occupiedTile)
+                        _occupiedTile.currentTileState = Tile.TileState.Empty;
 
+                    _occupiedTile = tile;
+                    _occupiedTile.currentTileState = _targetState;
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
     private void OnDrawGizmos()
     {
         for (int i = 0; i < gridTiles.Count; i++)
@@ -130,10 +170,11 @@ public class Grid : MonoBehaviour
             for (int j = 0; j < gridTiles[i].Count; j++)
             {
                 //Gizmos.DrawCube(gridTiles[i][j].position, gridTiles[i][j].size);
-                var pos = new Vector3(gridTiles[i][j].position.x, 
-                    gridTiles[i][j].position.y,
+                var offset = (tileWidth * 1.1f);
+                var pos = new Vector3(gridTiles[i][j].boundingBox.position.x - offset, 
+                    gridTiles[i][j].boundingBox.position.y,
                     0);
-                var cubeSize = gridTiles[0][0].size.x;
+                var cubeSize = gridTiles[0][0].boundingBox.dimensions.x;
 
                 Handles.CubeHandleCap(0, pos,
                            Quaternion.LookRotation(Vector3.forward, Vector3.up), cubeSize, EventType.Repaint);
@@ -145,19 +186,23 @@ public class Grid : MonoBehaviour
                         break;
                     case Tile.TileState.OccupiedByBullet:
                         Handles.color = Color.yellow;
-                        Handles.Label(pos, "O-B");
+                        Handles.Label(pos, "OB");
                         break;
                     case Tile.TileState.OccupiedByAlien:
                         Handles.color = Color.red;
-                        Handles.Label(pos, "O-A");
+                        Handles.Label(pos, "OA");
                         break;
                     case Tile.TileState.OccupiedByAlienLaser:
                         Handles.color = Color.yellow;
-                        Handles.Label(pos, "O-AL");
+                        Handles.Label(pos, "OAL");
                         break;
                     case Tile.TileState.TargetedByAlien:
                         Handles.color = Color.green;
-                        Handles.Label(pos, "O-A");
+                        Handles.Label(pos, "OA");
+                        break;
+                    case Tile.TileState.OccupiedByPlayer:
+                        Handles.color = Color.green;
+                        Handles.Label(pos, "OP");
                         break;
                     default:
                         break;

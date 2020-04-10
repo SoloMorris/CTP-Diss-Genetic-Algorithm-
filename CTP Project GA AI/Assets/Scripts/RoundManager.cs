@@ -42,7 +42,7 @@ public class RoundManager : MonoBehaviour
         var GAinst = GeneticAlien._instance;
         if (GAinst.killCount > (roundLength / 2))
         {
-            GAinst.killCount = 0;
+            //GAinst.killCount = 0;
             EndRound();
         }
         if (!roundActive)
@@ -65,27 +65,16 @@ public class RoundManager : MonoBehaviour
         var GAinst = GeneticAlien._instance;
         var alienlist = GAinst.GetAlienList();
         
-        difficulty = GAinst.FindDifficulty();
+        //difficulty = GAinst.FindDifficulty();
 
-        //  Revive all the aliens
-        for (int i = 0; i < alienlist.Count; i++)
-        {
-            alienlist[i].GetComponent<GeneticAlien.Alien>().instance.GetComponent<AlienController>().killed = false;
-            alienlist[i].GetComponent<GeneticAlien.Alien>().instance.GetComponent<AlienController>().alive = true;
-        }
         if (roundSet == epochs)
         {
-            GAinst.ga.CreateNewGeneration();
             //Save the current ga as a JSON file.
             roundSet = 0;
         }
         else
             roundSet += 1;
-        for (int i = 0; i < GAinst.GetAlienList().Count; i++)
-        {
-            alienlist[i].GetComponent<GeneticAlien.Alien>().movesUsed = 0;
-            alienlist[i].GetComponent<GeneticAlien.Alien>().dna = GAinst.ga.population[i];
-        }
+
         GAinst.ResetPlayerAI();
         currentRound++;
         if (playerHit)
