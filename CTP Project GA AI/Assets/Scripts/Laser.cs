@@ -35,6 +35,7 @@ public class Laser : Bullet
         transform.position = startPosition;
         GetComponent<Rigidbody2D>().velocity = Vector2.zero;
         //inUse = false;
+        occupiedTile.currentTileState = Grid.Tile.TileState.Empty;
         StartCoroutine(KillLaser());
     }
 

@@ -13,6 +13,7 @@ public class PlayerController : MonoBehaviour
 
     //  Bullet control
     [SerializeField] private GameObject bullet;
+    [SerializeField] [Range(1,5)] private int ammunition = 1;
     private List<GameObject> bullets = new List<GameObject>();
     public float fireTimer = 0.0f;
 
@@ -30,7 +31,7 @@ public class PlayerController : MonoBehaviour
         grid = Grid.instance;
         player = GetComponent<Rigidbody2D>();
 
-        for (int i = 0; i < 2; i++)
+        for (int i = 0; i < ammunition; i++)
         {
             bullets.Add(bullet);
             bullets[i] = Instantiate(bullet);

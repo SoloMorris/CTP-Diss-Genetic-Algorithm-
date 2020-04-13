@@ -94,7 +94,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a27a48dd0335df24cbda62b0fcfafe12, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 14
+  speed: 16
   inUse: 0
   player: {fileID: 0}
   hitAlien: 0

@@ -3,7 +3,10 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using System.IO;
 
+
+[System.Serializable]
 public class GeneticAlien : MonoBehaviour
 {
 
@@ -135,13 +138,37 @@ public class GeneticAlien : MonoBehaviour
         difficultyText.enabled = false;
         random = new System.Random();
 
-        //  Create the genetic algorithms and make an alien set for each.
-        ga = new GeneticAlgorithm(waveSize, allowedMoves, random, GetRandomMovementDirection, FitnessFunction, aliensKeptPerGeneration, mutationRate);
-        gaB = ga;
-        
+        LoadGA(waveSize);
         CreateNewAlienSet(ga, primaryAliens, waveSize);
         alienSizeDefault = primaryAliens[0].GetComponent<Alien>().instance.gameObject.transform.localScale;
         roundActive = true;
+    }
+
+    private void LoadGA(int waveSize)
+    {
+        //  If load is enabled in editor, find the .json and load data from that instead
+        if (TrainGAManager.instance.Load)
+        {
+            SaveData loadedData = JsonUtility.FromJson<SaveData>(File.ReadAllText(Application.dataPath + "GAData.json"));
+            ga = new GeneticAlgorithm(waveSize, allowedMoves, random, GetRandomMovementDirection, FitnessFunction, aliensKeptPerGeneration, mutationRate);
+
+            ga.generation = loadedData.generation;
+            for (int i = 0; i < 10; i++)
+            {
+                for (int j = 0; j < allowedMoves; j += 2)
+                {
+                    ga.population[i].genes[j][0] = loadedData.rawGAData[j];
+                    ga.population[i].genes[j][1] = loadedData.rawGAData[j + 1];
+                }
+            }
+            gaB = ga;
+        }
+        else
+        {
+            //  Create the genetic algorithms and make an alien set for each.
+            ga = new GeneticAlgorithm(waveSize, allowedMoves, random, GetRandomMovementDirection, FitnessFunction, aliensKeptPerGeneration, mutationRate);
+            gaB = ga;
+        }
     }
 
     private void CreateNewAlienSet(GeneticAlgorithm _ga, List<GameObject> _aliens, int _count)
@@ -212,7 +239,7 @@ public class GeneticAlien : MonoBehaviour
             if (primaryAliens[i].GetComponent<Alien>().instance.GetComponent<AlienController>().killed)
             {
                 var _alien = primaryAliens[i].GetComponent<Alien>();
-                if (_alien.occupiedTile != null)
+                if (GetAlienHasValidTile(_alien.gameObject))
                 {
                     _alien.occupiedTile.currentTileState = Grid.Tile.TileState.Empty;
                     _alien.occupiedTile = null;
@@ -253,7 +280,7 @@ public class GeneticAlien : MonoBehaviour
 
         if (gaB.population.Count > 50)
         {
-            gaB.population.RemoveRange(10, (gaB.population.Count - 1));
+            gaB.population.RemoveRange(10, (40));
         }
         for (int i = 0; i < gaB.population.Count; i++)
         {
@@ -284,7 +311,7 @@ public class GeneticAlien : MonoBehaviour
                     UpdateAlienPosition(i);
                 else
                     if (alien.dna.genes[alien.movesUsed][0] == 's')
-                        FireAtTile(i, activeAliens[i].GetComponent<Alien>().targetTile);
+                        FireAtTile(i);
             }
             alienMovementTimer = 0;
             elapsedTime = 0;
@@ -313,7 +340,7 @@ public class GeneticAlien : MonoBehaviour
     private void UpdateAlienPosition(int _index)
     {
         CheckTilesAgainstAliens();
-
+        
             var myTile = activeAliens[_index].GetComponent<Alien>().occupiedTile;
             if (myTile.boundingBox.position != 
                 (Vector2)activeAliens[_index].GetComponent<Alien>().transform.position)
@@ -323,20 +350,40 @@ public class GeneticAlien : MonoBehaviour
             }
 
             var alien = activeAliens[_index].GetComponent<Alien>();
+
+            //Breaks if this function has been called due to recursion
+            if (alien.dna.genes[alien.movesUsed][0] != 'm')
+                return;
+
             MoveToNewTile(_index, alien.targetTile);
             myTile = alien.occupiedTile;
             activeAliens[_index].transform.position = myTile.boundingBox.position;
             alien.occupiedTile.currentTileState = Grid.Tile.TileState.OccupiedByAlien;
             alien.occupedTileVal = alien.occupiedTile.id;
             alien.occupiedTilePos = alien.occupiedTile.boundingBox.position;
+
+
+        //  Final check if aliens are occupying the same tile
+        for (int i = 0; i < activeAliens.Count; i++)
+        {
+            if (i == _index && _index < (activeAliens.Count - 1))
+                ++i;
+
+          if (GetAlienHasValidTile(activeAliens[i]) 
+                && alien.occupiedTile == activeAliens[i].GetComponent<Alien>().occupiedTile)
+            {
+                AlienBehaviour(_index);
+                UpdateAlienPosition(_index);
+            }
+        }
     }
 
-    private void FireAtTile(int _index, Grid.Tile _target)
+    private void FireAtTile(int _index)
     {
         var alien = activeAliens[_index].GetComponent<Alien>();
         if (alien.targetTile != null && alien.dna.genes[alien.movesUsed][0] == 's')
         {
-            activeAliens[_index].GetComponent<Alien>().FireLaser(_target);
+            activeAliens[_index].GetComponent<Alien>().FireLaser(alien.targetTile);
         }
     }
     private void AlienBehaviour(int _index)
@@ -349,11 +396,11 @@ public class GeneticAlien : MonoBehaviour
                 {
                     case 'm':
                         SetBehaviour('m', _index);
-                        print("YAAT");
+                        //print("YAAT");
                         break;
                     case 's':
                         SetBehaviour('s', _index);
-                        print("YEET");
+                        //print("YEET");
                         break;
                     case 't':
                         print("YOTE");
@@ -408,11 +455,10 @@ public class GeneticAlien : MonoBehaviour
             //  Check if the target tile is valid before moving there
             //  If it isn't, loop the function
 
-            if ( alien.occupiedTile != null && (alien.occupiedTile.surroundingTiles[tIndex] != null &&
+            if ( GetAlienHasValidTile(alien.gameObject) && (alien.occupiedTile.surroundingTiles[tIndex] != null &&
                 alien.occupiedTile.surroundingTiles[tIndex].currentTileState == Grid.Tile.TileState.Empty))
             {
                 alien.targetTile = alien.occupiedTile.surroundingTiles[tIndex];
-                print("Alien " + _index + " behaviour set");
             }
             else
             {
@@ -431,11 +477,9 @@ public class GeneticAlien : MonoBehaviour
             //  Check if the target tile is valid before firing there
             //  If it isn't, loop the function
 
-            if (alien.occupiedTile != null && (alien.occupiedTile.surroundingTiles[tIndex] != null))
+            if (GetAlienHasValidTile(alien.gameObject) && (alien.occupiedTile.surroundingTiles[tIndex] != null))
             {
                 alien.targetTile = alien.occupiedTile.surroundingTiles[tIndex];
-                print("Alien " + _index + " behaviour set");
-
             }
             else
             {
@@ -472,12 +516,20 @@ public class GeneticAlien : MonoBehaviour
                         if (activeAliens[k].GetComponent<Alien>().targetTile == targetedTiles[i])
                         {
                             activeAliens[k].GetComponent<Alien>().targetTile = null;
+                            AlienBehaviour(k);
                             break;
                         }
                     }
                 }
             }
         }
+    }
+
+    private bool GetAlienHasValidTile(GameObject _object)
+    {
+        if (_object.GetComponent<Alien>().occupiedTile != null)
+            return true;
+        else return false;
     }
     public int FindAlienInList()
     {

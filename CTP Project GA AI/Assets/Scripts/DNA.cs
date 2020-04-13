@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
+[System.Serializable]
 public class DNA : MonoBehaviour
 {
     public List<char[]> genes = new List<char[]>();

@@ -470,6 +470,7 @@ GameObject:
   - component: {fileID: 464725985}
   - component: {fileID: 464725984}
   - component: {fileID: 464725986}
+  - component: {fileID: 464725987}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -541,8 +542,18 @@ MonoBehaviour:
   alienSizeMax: {x: 1, y: 0.45, z: 1}
   wall1: {fileID: 1724652864}
   wall2: {fileID: 822343512}
-  ga: {fileID: 0}
-  gaB: {fileID: 0}
+  ga:
+    population: []
+    generation: 0
+    mutationRate: 0
+    bestFitness: 0
+    Elitism: 0
+  gaB:
+    population: []
+    generation: 0
+    mutationRate: 0
+    bestFitness: 0
+    Elitism: 0
   difficultyText: {fileID: 136321855}
   killCount: 0
   mutationRate: 0.0527
@@ -587,6 +598,21 @@ MonoBehaviour:
   alien: {fileID: 0}
   leftSide: {fileID: 1724652864}
   rightSide: {fileID: 822343512}
+--- !u!114 &464725987
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 464725981}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8b99fd68572534b4db8e9074a6e2f476, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Load: 1
+  newAlgorithm: {fileID: 0}
+  saveTrigger: 0
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0
@@ -1089,6 +1115,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   moveSpeed: 7.77
   bullet: {fileID: 8656924238259196373, guid: 03a126b7ed230064697e3b5a861b7ece, type: 3}
+  ammunition: 1
   fireTimer: 0
   automatePlayerMovement: 0
 --- !u!61 &1015322097
@@ -1296,7 +1323,7 @@ GameObject:
   - component: {fileID: 1936827147}
   m_Layer: 0
   m_Name: Cube (1)
-  m_TagString: Untagged
+  m_TagString: Wall
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

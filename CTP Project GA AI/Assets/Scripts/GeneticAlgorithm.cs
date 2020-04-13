@@ -3,7 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class GeneticAlgorithm : MonoBehaviour
+[System.Serializable]
+public class GeneticAlgorithm
 {
     public List<DNA> population = new List<DNA>();
     List<DNA> newPopulation = new List<DNA>();
@@ -115,7 +116,7 @@ public class GeneticAlgorithm : MonoBehaviour
             {
                 return population[i];
             }
-            print(population[i].Fitness);
+            Debug.Log(population[i].Fitness);
             randomNumber -= population[i].Fitness;
 
         }

@@ -61,8 +61,9 @@ public class Bullet : MonoBehaviour
     {
         transform.position = startPosition;
         GetComponent<Rigidbody2D>().velocity = Vector2.zero;
+        if (occupiedTile != null)
+            occupiedTile.currentTileState = Grid.Tile.TileState.Empty;
         inUse = false;
-
     }
 
     virtual protected bool BulletLaserCollision()
