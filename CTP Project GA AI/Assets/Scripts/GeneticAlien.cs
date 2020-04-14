@@ -433,20 +433,51 @@ public class GeneticAlien : MonoBehaviour
             var alien = primaryAliens[alienID].GetComponent<Alien>();
 
             //Spawn the aliens at a position based on their genes
-            //alien.instance.transform.position = spawnPoints[ga.population[alienID].genes[0]].transform.position;
 
-            var startTile = new Grid.Tile();
-            startTile.currentTileState = Grid.Tile.TileState.OccupiedByAlien;
-            while (startTile.currentTileState != Grid.Tile.TileState.Empty)
+            //startTile = Grid.instance.gridTiles[Grid.instance.gridTiles.Count - 1][
+            //    (int)UnityEngine.Random.Range(0, Grid.instance.gridTiles[0].Count)];
+
+            var startTile = Grid.instance.gridTiles[0][0];
+        
+            var yIndex = (int)char.GetNumericValue(alien.dna.genes[0][1]);
+            var xIndex = ((int)char.GetNumericValue(alien.dna.genes[1][1]) + yIndex);
+
+            startTile = Grid.instance.gridTiles[yIndex + 12][xIndex  + 10];
+
+
+
+            var i = 0;
+            foreach (var listAlien in primaryAliens)
             {
-                //startTile = Grid.instance.gridTiles[Grid.instance.gridTiles.Count - 1][
-                //    (int)UnityEngine.Random.Range(0, Grid.instance.gridTiles[0].Count)];
-                var yIndex = (int)char.GetNumericValue(alien.dna.genes[0][1]);
-                var xIndex = ((int)char.GetNumericValue(alien.dna.genes[1][1]) + yIndex);
-                startTile = Grid.instance.gridTiles[yIndex + 12][xIndex  + 10];
+                var listAlienID = listAlien.GetComponent<Alien>().id;
+                if (listAlien.GetComponent<Alien>() != alien &&
+                GetAlienHasValidTile(listAlien) &&
+                listAlien.GetComponent<Alien>().occupiedTile.id == startTile.id)
+                {
+                    startTile = Grid.instance.gridTiles[yIndex + 12][(xIndex + 10) - i];
+                }
+                i++;
+
             }
-            alien.instance.transform.position = startTile.boundingBox.position;
-            alien.occupiedTile = startTile;
+
+               alien.instance.transform.position = startTile.boundingBox.position;
+                alien.occupiedTile = startTile;
+            
+                
+            //foreach (var listAlien in primaryAliens)
+            //{
+            //    var i = 0;
+            //    if (GetAlienHasValidTile(listAlien) &&
+            //        listAlien.GetComponent<Alien>().occupiedTile == startTile && 
+            //        listAlien.GetComponent<Alien>() != alien)
+            //    {
+            //        alien.instance.transform.position = startTile.boundingBox.position;
+            //        alien.occupiedTile = startTile;
+            //        startTile = Grid.instance.gridTiles[yIndex + 12][(xIndex + 10) - i];
+
+            //    }
+            //    i++;
+            //}
 
             alien.alive = true;
             alien.instance.gameObject.SetActive(true);
