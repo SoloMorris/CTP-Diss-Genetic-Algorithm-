@@ -83,7 +83,7 @@ public class GeneticAlien : MonoBehaviour
             {
                 //Create new instructions, randomly initialise from the alphabet and each available direction
                 char[] instructions = new char[2];
-                while (instructions[0] != 'm' && instructions[0] != 's') //&& instructions[0] != 't')
+                while (instructions[0] != 'm' && instructions[0] != 's' && instructions[0] != 'w')
                 {
                     char inst = al[UnityEngine.Random.Range(0, al.Length)];
                     
@@ -151,17 +151,26 @@ public class GeneticAlien : MonoBehaviour
         {
             SaveData loadedData = JsonUtility.FromJson<SaveData>(File.ReadAllText(Application.dataPath + "GAData.json"));
             ga = new GeneticAlgorithm(waveSize, allowedMoves, random, GetRandomMovementDirection, FitnessFunction, aliensKeptPerGeneration, mutationRate);
-
             ga.generation = loadedData.generation;
+            var cal = ga.population[8].genes[5];
+
+            var GAGeneData = loadedData.rawGAData;
+
+            char testgene = GAGeneData[5];
             for (int i = 0; i < 10; i++)
             {
-                for (int j = 0; j < allowedMoves; j += 2)
+                var index = 0;
+                //  Apply the data to all genes in the population
+                for (int j = (i * allowedMoves); j < allowedMoves * (i + 1); j += 2)
                 {
-                    ga.population[i].genes[j][0] = loadedData.rawGAData[j];
-                    ga.population[i].genes[j][1] = loadedData.rawGAData[j + 1];
+                    ga.population[i].genes[index][0] = GAGeneData[j];
+                    ga.population[i].genes[index][1] = GAGeneData[j + 1];
+                    index++;
                 }
             }
             gaB = ga;
+            var bal = ga.population[8].genes[5];
+
         }
         else
         {
@@ -196,7 +205,7 @@ public class GeneticAlien : MonoBehaviour
     //  Then the alien retrieves its genes from the GA.
     private void AttachDNAToGA(GeneticAlgorithm _ga, int i, GameObject _alien)
     {
-        _ga.population[i] = (new DNA(allowedMoves, GetRandomMovementDirection, FitnessFunction, _alien.GetComponent<Alien>()));
+        _ga.population[i].Owner = _alien.GetComponent<Alien>();
         _alien.GetComponent<Alien>().dna = _ga.population[i];
     }
 
@@ -215,11 +224,12 @@ public class GeneticAlien : MonoBehaviour
             }
             difficultyText.enabled = false;
             var deathCounter = CheckIfAliensKilled(true);
-            if (deathCounter != null && deathCounter.Count >= 5) 
+            if (deathCounter != null && deathCounter.Count >= (RoundManager.instance.roundLength / 2)) 
             {
                 SwapGABacktoFront(deathCounter);
             }
             AlienLogic();
+
         }
     }
 
@@ -331,6 +341,12 @@ public class GeneticAlien : MonoBehaviour
             alien.occupiedTile.currentTileState = Grid.Tile.TileState.Empty;
             alien.occupiedTile = _newTile;
             alien.targetTile = null;
+
+            var myTile = alien.occupiedTile;
+            activeAliens[_index].transform.position = myTile.boundingBox.position;
+            alien.occupiedTile.currentTileState = Grid.Tile.TileState.OccupiedByAlien;
+            alien.occupedTileVal = alien.occupiedTile.id;
+            alien.occupiedTilePos = alien.occupiedTile.boundingBox.position;
         }
     }
     /*  Check the alien's current tile against their 
@@ -356,13 +372,7 @@ public class GeneticAlien : MonoBehaviour
                 return;
 
             MoveToNewTile(_index, alien.targetTile);
-            myTile = alien.occupiedTile;
-            activeAliens[_index].transform.position = myTile.boundingBox.position;
-            alien.occupiedTile.currentTileState = Grid.Tile.TileState.OccupiedByAlien;
-            alien.occupedTileVal = alien.occupiedTile.id;
-            alien.occupiedTilePos = alien.occupiedTile.boundingBox.position;
-
-
+         
         //  Final check if aliens are occupying the same tile
         for (int i = 0; i < activeAliens.Count; i++)
         {
@@ -402,8 +412,9 @@ public class GeneticAlien : MonoBehaviour
                         SetBehaviour('s', _index);
                         //print("YEET");
                         break;
-                    case 't':
-                        print("YOTE");
+                    case 'w':
+                    SetBehaviour('w', _index);
+                    print("YOTE");
                         break;
                         //case 3:
                         //    if (UnityEngine.Random.Range(1, 10) > 5)
@@ -423,12 +434,16 @@ public class GeneticAlien : MonoBehaviour
 
             //Spawn the aliens at a position based on their genes
             //alien.instance.transform.position = spawnPoints[ga.population[alienID].genes[0]].transform.position;
+
             var startTile = new Grid.Tile();
             startTile.currentTileState = Grid.Tile.TileState.OccupiedByAlien;
             while (startTile.currentTileState != Grid.Tile.TileState.Empty)
             {
-                startTile = Grid.instance.gridTiles[Grid.instance.gridTiles.Count - 1][
-                    (int)UnityEngine.Random.Range(0, Grid.instance.gridTiles[0].Count)];
+                //startTile = Grid.instance.gridTiles[Grid.instance.gridTiles.Count - 1][
+                //    (int)UnityEngine.Random.Range(0, Grid.instance.gridTiles[0].Count)];
+                var yIndex = (int)char.GetNumericValue(alien.dna.genes[0][1]);
+                var xIndex = ((int)char.GetNumericValue(alien.dna.genes[1][1]) + yIndex);
+                startTile = Grid.instance.gridTiles[yIndex + 12][xIndex  + 10];
             }
             alien.instance.transform.position = startTile.boundingBox.position;
             alien.occupiedTile = startTile;
@@ -454,16 +469,32 @@ public class GeneticAlien : MonoBehaviour
 
             //  Check if the target tile is valid before moving there
             //  If it isn't, loop the function
-
-            if ( GetAlienHasValidTile(alien.gameObject) && (alien.occupiedTile.surroundingTiles[tIndex] != null &&
+            //  In this case, check if the column is being attacked by the player.
+            bool shouldIMoveToColumn = false;
+            if ((alien.occupiedTile.surroundingTiles[tIndex] != null &&
                 alien.occupiedTile.surroundingTiles[tIndex].currentTileState == Grid.Tile.TileState.Empty))
+            {
+                var column = Grid.instance.GetColumn(alien.occupiedTile.surroundingTiles[tIndex]);
+                foreach (var tile in column)
+                {
+                    if (tile.currentTileState == Grid.Tile.TileState.OccupiedByBullet)
+                    {
+                        shouldIMoveToColumn = false;
+                        break;
+                    }
+                    shouldIMoveToColumn = true;
+                }
+            }
+
+            if ( GetAlienHasValidTile(alien.gameObject)
+                && shouldIMoveToColumn)
             {
                 alien.targetTile = alien.occupiedTile.surroundingTiles[tIndex];
             }
             else
             {
                 alien.movesUsed++;
-                SetBehaviour(_gene, _index);
+                AlienBehaviour(_index);
                 return;
             }
         }
@@ -475,18 +506,38 @@ public class GeneticAlien : MonoBehaviour
             var tIndex = (int)char.GetNumericValue(targetTile); //index of the target tile converted to int from char
 
             //  Check if the target tile is valid before firing there
-            //  If it isn't, loop the function
+            //  If it isn't, loop the function.
+            //  In this case, check if the column already has a laser in it to prevent spam.
+            bool shouldIFireOnColumn = false;
 
-            if (GetAlienHasValidTile(alien.gameObject) && (alien.occupiedTile.surroundingTiles[tIndex] != null))
+            if (alien.occupiedTile.surroundingTiles[tIndex] != null)
+            {
+                var column = Grid.instance.GetColumn(alien.occupiedTile.surroundingTiles[tIndex]);
+                foreach (var tile in column)
+                {
+                    if (tile.currentTileState == Grid.Tile.TileState.OccupiedByAlienLaser)
+                    {
+                        shouldIFireOnColumn = false;
+                        break;
+                    }
+                    shouldIFireOnColumn = true;
+                }
+            }
+            if (GetAlienHasValidTile(alien.gameObject)
+                && shouldIFireOnColumn)
             {
                 alien.targetTile = alien.occupiedTile.surroundingTiles[tIndex];
             }
             else
             {
                 alien.movesUsed++;
-                SetBehaviour(_gene, _index);
+                AlienBehaviour(_index);
                 return;
             }
+        }
+        else if(_gene == 'w')
+        {
+            //Do nothing this tick.
         }
     }
 

@@ -14,6 +14,7 @@ public class Grid : MonoBehaviour
      
     private Vector2 gridArray;
     public List<List<Tile>> gridTiles { get; private set; } = new List<List<Tile>>();
+
     public class Tile
     {
         public enum TileState
@@ -42,6 +43,7 @@ public class Grid : MonoBehaviour
         }
 
         public int id;
+        public int column = 0;
         public BoundingBox boundingBox;
         public Tile[] surroundingTiles = new Tile[8];
 
@@ -85,6 +87,7 @@ public class Grid : MonoBehaviour
             , -4.8f, 0));
         Vector3 offset = defaultPosition;
         int id = 0;
+
         for (int i = 0; i < gridHeight; i++)
         {
             List<Tile> tempList = new List<Tile>();
@@ -94,6 +97,7 @@ public class Grid : MonoBehaviour
                 Tile _tile = new Tile();
                 _tile.boundingBox = new Tile.BoundingBox(offset, new Vector2(tileWidth, tileHeight));
                 _tile.id = id;
+                _tile.column = j;
                 tempList.Add(_tile);
                 id++;
                 offset.x += tileWidth * 1.1f;
@@ -210,6 +214,17 @@ public class Grid : MonoBehaviour
             }
         }
 
+    }
+
+    public List<Tile> GetColumn(Tile targetTile)
+    {
+        List<Tile> column = new List<Tile>();
+
+        for (int i = 0; i < gridHeight; i++)
+        {
+            column.Add(gridTiles[i][targetTile.column]);
+        }
+            return column;
     }
     //public Vector2 GetWorldPos(Vector2 array)
     //{
