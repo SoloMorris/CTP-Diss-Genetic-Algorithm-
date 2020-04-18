@@ -75,6 +75,15 @@ public class RoundManager : MonoBehaviour
         else
             roundSet += 1;
 
+        foreach (var alien  in alienlist)
+        {
+            if (alien.GetComponent<GeneticAlien.Alien>().occupiedTile != null)
+                alien.GetComponent<GeneticAlien.Alien>().occupiedTile.currentTileState = Grid.Tile.TileState.Empty;
+            alien.GetComponent<AlienController>().deathPosition = alien.transform.position;
+
+            alien.GetComponent<GeneticAlien.Alien>().occupiedTile = null;
+            alien.GetComponent<GeneticAlien.Alien>().alive = false;
+        }
         GAinst.ResetPlayerAI();
         currentRound++;
         if (playerHit)

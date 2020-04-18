@@ -33,7 +33,7 @@ public class DNA : MonoBehaviour
     public float CalculateFitness(int index)
     {
         Fitness = FitnessFunction(index);
-        return 0;
+        return Fitness; // This??
     }
 
     public DNA Crossover(DNA partner)

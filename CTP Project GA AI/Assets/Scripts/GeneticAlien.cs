@@ -112,11 +112,18 @@ public class GeneticAlien : MonoBehaviour
         public int occupedTileVal;
         public Vector2 occupiedTilePos;
         public Grid.Tile targetTile;
+        public int spawnXIndex = 0;
+        public int spawnYIndex = 0;
         public void FireLaser(Grid.Tile _target)
         {
             var firedLaser = Instantiate(laserPrefab);
             firedLaser.transform.position = _target.boundingBox.position;
             firedLaser.GetComponent<Laser>().inUse = true;
+        }
+        public void UpdateSpawn()
+        {
+            spawnYIndex = (int)char.GetNumericValue(dna.genes[0][1]);
+            spawnXIndex = (int)char.GetNumericValue(dna.genes[1][1]) + spawnYIndex;
         }
     }
 
@@ -152,11 +159,8 @@ public class GeneticAlien : MonoBehaviour
             SaveData loadedData = JsonUtility.FromJson<SaveData>(File.ReadAllText(Application.dataPath + "GAData.json"));
             ga = new GeneticAlgorithm(waveSize, allowedMoves, random, GetRandomMovementDirection, FitnessFunction, aliensKeptPerGeneration, mutationRate);
             ga.generation = loadedData.generation;
-            var cal = ga.population[8].genes[5];
 
             var GAGeneData = loadedData.rawGAData;
-
-            char testgene = GAGeneData[5];
             for (int i = 0; i < 10; i++)
             {
                 var index = 0;
@@ -168,15 +172,15 @@ public class GeneticAlien : MonoBehaviour
                     index++;
                 }
             }
-            gaB = ga;
-            var bal = ga.population[8].genes[5];
-
+            gaB = new GeneticAlgorithm(waveSize, allowedMoves, random, GetRandomMovementDirection, FitnessFunction, aliensKeptPerGeneration, mutationRate);
+            gaB.population.Clear();
         }
         else
         {
             //  Create the genetic algorithms and make an alien set for each.
             ga = new GeneticAlgorithm(waveSize, allowedMoves, random, GetRandomMovementDirection, FitnessFunction, aliensKeptPerGeneration, mutationRate);
-            gaB = ga;
+            gaB = new GeneticAlgorithm(waveSize, allowedMoves, random, GetRandomMovementDirection, FitnessFunction, aliensKeptPerGeneration, mutationRate);
+            gaB.population.Clear();
         }
     }
 
@@ -278,7 +282,7 @@ public class GeneticAlien : MonoBehaviour
     }
 
     //  Add x dead aliens to the backup GA, then create a new generation.
-    //  If it exceeds 50, remove the excess then give all dead aliens the new DNA.
+    //  If it exceeds cap, remove the excess then give all dead aliens the new DNA.
     private void SwapGABacktoFront(List<GameObject> _deadAliens)
     {
         print("Swapping GA");
@@ -286,23 +290,21 @@ public class GeneticAlien : MonoBehaviour
         {
             gaB.population.Add(_deadAliens[i].GetComponent<Alien>().dna);
         }
+
         gaB.CreateNewGeneration();
 
-        if (gaB.population.Count > 50)
+        if (gaB.population.Count > 30)
         {
-            gaB.population.RemoveRange(10, (40));
+            gaB.population.RemoveRange(10, (20));
         }
-        for (int i = 0; i < gaB.population.Count; i++)
+        for (int j = 0; j < _deadAliens.Count; j++)
         {
-            for (int j = 0; j < primaryAliens.Count; j++)
+            if (primaryAliens[j].GetComponent<AlienController>().killed)
             {
-                if (primaryAliens[j].GetComponent<AlienController>().killed)
-                {
-                    primaryAliens[j].GetComponent<Alien>().alive = false;
-                    primaryAliens[j].GetComponent<Alien>().dna = gaB.population[i];
-                    primaryAliens[j].GetComponent<Alien>().movesUsed = 0;
-                    primaryAliens[j].GetComponent<AlienController>().killed = false;
-                }
+                primaryAliens[j].GetComponent<Alien>().alive = false;
+                primaryAliens[j].GetComponent<Alien>().dna = gaB.population[j];
+                primaryAliens[j].GetComponent<Alien>().movesUsed = 0;
+                primaryAliens[j].GetComponent<AlienController>().killed = false;
             }
         }
     }
@@ -431,6 +433,9 @@ public class GeneticAlien : MonoBehaviour
         if (alienID >= 0)
         {
             var alien = primaryAliens[alienID].GetComponent<Alien>();
+            var alien1 = primaryAliens[1].GetComponent<Alien>();
+            var alien2 = primaryAliens[2].GetComponent<Alien>();
+            var alien5 = primaryAliens[5].GetComponent<Alien>();
 
             //Spawn the aliens at a position based on their genes
 
@@ -438,15 +443,12 @@ public class GeneticAlien : MonoBehaviour
             //    (int)UnityEngine.Random.Range(0, Grid.instance.gridTiles[0].Count)];
 
             var startTile = Grid.instance.gridTiles[0][0];
-        
-            var yIndex = (int)char.GetNumericValue(alien.dna.genes[0][1]);
-            var xIndex = ((int)char.GetNumericValue(alien.dna.genes[1][1]) + yIndex);
 
-            startTile = Grid.instance.gridTiles[yIndex + 12][xIndex  + 10];
+            alien.UpdateSpawn();
 
+            startTile = Grid.instance.gridTiles[(Grid.instance.gridHeight - 1) - alien.spawnYIndex][((Grid.instance.gridLength - 1) - alien.spawnXIndex)];
 
-
-            var i = 0;
+           var i = 1;
             foreach (var listAlien in primaryAliens)
             {
                 var listAlienID = listAlien.GetComponent<Alien>().id;
@@ -454,7 +456,7 @@ public class GeneticAlien : MonoBehaviour
                 GetAlienHasValidTile(listAlien) &&
                 listAlien.GetComponent<Alien>().occupiedTile.id == startTile.id)
                 {
-                    startTile = Grid.instance.gridTiles[yIndex + 12][(xIndex + 10) - i];
+                    startTile = Grid.instance.gridTiles[(Grid.instance.gridHeight - 1) - alien.spawnYIndex - 1][((Grid.instance.gridLength -1 )- alien.spawnXIndex) - i];
                 }
                 i++;
 
@@ -510,7 +512,7 @@ public class GeneticAlien : MonoBehaviour
                 {
                     if (tile.currentTileState == Grid.Tile.TileState.OccupiedByBullet)
                     {
-                        shouldIMoveToColumn = false;
+                       shouldIMoveToColumn = false;
                         break;
                     }
                     shouldIMoveToColumn = true;
@@ -660,7 +662,7 @@ public class GeneticAlien : MonoBehaviour
     {
         for (int i = 0; i < primaryAliens.Count; i++)
         {
-            primaryAliens[i].GetComponent<Alien>().instance.GetComponent<AlienController>().killed = true;
+            primaryAliens[i].GetComponent<Alien>().instance.GetComponent<AlienController>().alive = false;
         }
         CheckIfAliensKilled();
     }
@@ -690,7 +692,7 @@ public class GeneticAlien : MonoBehaviour
 
     bool CheckPlayerTargetValid()
     {
-        for (int i = 0; i < primaryAliens.Count; i++)
+        for (int i = 0; i < activeAliens.Count; i++)
         {
             if (player.GetComponent<PlayerController>().GetTarget() == activeAliens[i].GetComponent<Alien>() 
                 && activeAliens[i].GetComponent<Alien>().instance.activeSelf)
