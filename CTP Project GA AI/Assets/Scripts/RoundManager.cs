@@ -61,7 +61,7 @@ public class RoundManager : MonoBehaviour
     public void EndRound( bool playerHit = false)
     {
         print("Round over");
-
+        roundActive = false;
         var GAinst = GeneticAlien._instance;
         var alienlist = GAinst.GetAlienList();
         
@@ -82,8 +82,8 @@ public class RoundManager : MonoBehaviour
             alien.GetComponent<AlienController>().deathPosition = alien.transform.position;
 
             alien.GetComponent<GeneticAlien.Alien>().occupiedTile = null;
-            alien.GetComponent<GeneticAlien.Alien>().alive = false;
         }
+        GAinst.SetupRound();
         GAinst.ResetPlayerAI();
         currentRound++;
         if (playerHit)

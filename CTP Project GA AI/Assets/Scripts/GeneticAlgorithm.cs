@@ -12,7 +12,6 @@ public class GeneticAlgorithm
     public int generation;
     public float mutationRate;
     private System.Random random;
-
     private float totalFitness = 0;
     public float bestFitness;
     public char[][] bestGenes;
@@ -116,7 +115,6 @@ public class GeneticAlgorithm
             {
                 return population[i];
             }
-            Debug.Log(population[i].Fitness);
             randomNumber -= population[i].Fitness;
 
         }

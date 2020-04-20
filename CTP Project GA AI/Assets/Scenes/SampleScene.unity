@@ -579,10 +579,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   currentRound: 0
   roundActive: 0
-  roundLength: 10
+  roundLength: 18
   difficulty: 0
   deathTimer: 3
   waveTimer: 0.1
+  initialisingRound: 0
 --- !u!114 &464725986
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -610,7 +611,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8b99fd68572534b4db8e9074a6e2f476, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Load: 1
+  Load: 0
   newAlgorithm: {fileID: 0}
   saveTrigger: 0
 --- !u!1 &519420028
@@ -1115,7 +1116,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   moveSpeed: 7.77
   bullet: {fileID: 8656924238259196373, guid: 03a126b7ed230064697e3b5a861b7ece, type: 3}
-  ammunition: 1
+  ammunition: 5
   fireTimer: 0
   automatePlayerMovement: 0
 --- !u!61 &1015322097

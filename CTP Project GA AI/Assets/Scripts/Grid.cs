@@ -7,8 +7,8 @@ public class Grid : MonoBehaviour
 {
     public static Grid instance;
     [SerializeField] private GameObject alien, leftSide, rightSide;
-    public int gridLength { get; private set; } = 26 ;
-    public int gridHeight { get; private set; } = 20;
+    public int gridLength { get; private set; } = 29 ;
+    public int gridHeight { get; private set; } = 22;
     private float tileWidth;
     private float tileHeight;
      
@@ -100,11 +100,11 @@ public class Grid : MonoBehaviour
                 _tile.column = j;
                 tempList.Add(_tile);
                 id++;
-                offset.x += tileWidth * 1.1f;
+                offset.x += tileWidth;
             }
             gridTiles.Add(tempList);
 
-            offset.y += tileHeight * 1.1f;
+            offset.y += tileHeight;
             offset.x = defaultPosition.x;
         }
 

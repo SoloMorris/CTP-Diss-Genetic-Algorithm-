@@ -67,6 +67,7 @@ public class GeneticAlien : MonoBehaviour
 
     //Alien spawning and tickrate
     [Header("Movement and tickrate")]
+    private bool setup = true;
     [SerializeField] private float elapsedTime = 0.0f;
     [SerializeField] private float alienTickRate = 0.0f;
     [SerializeField] private float alienMovementTimer = 0.0f;
@@ -149,6 +150,16 @@ public class GeneticAlien : MonoBehaviour
         CreateNewAlienSet(ga, primaryAliens, waveSize);
         alienSizeDefault = primaryAliens[0].GetComponent<Alien>().instance.gameObject.transform.localScale;
         roundActive = true;
+
+    }
+    public void SetupRound()
+    {
+        foreach (var alien in primaryAliens)
+        {
+            alien.GetComponent<Alien>().alive = false;
+            alien.GetComponent<AlienController>().killed = false;
+        }
+        SwapGABacktoFront(primaryAliens);
     }
 
     private void LoadGA(int waveSize)
@@ -200,7 +211,6 @@ public class GeneticAlien : MonoBehaviour
             alienBrain.laserPrefab = laserPrefab;
 
             _aliens.Add(newAlien);
-
             //print("Successfully attached to alien " + ga.population[i].Owner.instance.gameObject.GetComponent<AlienController>().uid);
         }
     }
@@ -215,6 +225,14 @@ public class GeneticAlien : MonoBehaviour
 
     void Update()
     {
+        if (setup)
+        {
+            for (int i = 0; i < primaryAliens.Count; i++)
+            {
+                SpawnAliensInRound();
+            }
+            setup = false;
+        }
         roundActive = RoundManager.instance.roundActive;
         elapsedTime += Time.deltaTime;
         if (roundActive)
@@ -226,13 +244,12 @@ public class GeneticAlien : MonoBehaviour
                     print("Could not find player's target!");
                 }
             }
-            difficultyText.enabled = false;
+            AlienLogic();
             var deathCounter = CheckIfAliensKilled(true);
             if (deathCounter != null && deathCounter.Count >= (RoundManager.instance.roundLength / 2)) 
             {
                 SwapGABacktoFront(deathCounter);
             }
-            AlienLogic();
 
         }
     }
@@ -276,6 +293,7 @@ public class GeneticAlien : MonoBehaviour
         }
         if (_returnDead)
         {
+            print("There are " + deadAliens.Count + " dead aliens.");
             return deadAliens;
         }
         return null;
@@ -286,27 +304,25 @@ public class GeneticAlien : MonoBehaviour
     private void SwapGABacktoFront(List<GameObject> _deadAliens)
     {
         print("Swapping GA");
+        //  IS NOT BASED ON ROUND LENGTH, PLEASE REMEMBER TO CHANGE HERE
+
         for (int i = 0; i < _deadAliens.Count; i++)
         {
             gaB.population.Add(_deadAliens[i].GetComponent<Alien>().dna);
         }
 
-        gaB.CreateNewGeneration();
+            gaB.CreateNewGeneration();
 
-        if (gaB.population.Count > 30)
-        {
-            gaB.population.RemoveRange(10, (20));
-        }
+
         for (int j = 0; j < _deadAliens.Count; j++)
         {
-            if (primaryAliens[j].GetComponent<AlienController>().killed)
-            {
-                primaryAliens[j].GetComponent<Alien>().alive = false;
-                primaryAliens[j].GetComponent<Alien>().dna = gaB.population[j];
-                primaryAliens[j].GetComponent<Alien>().movesUsed = 0;
-                primaryAliens[j].GetComponent<AlienController>().killed = false;
-            }
+            _deadAliens[j].GetComponent<Alien>().dna = gaB.population[j];
+            _deadAliens[j].GetComponent<Alien>().movesUsed = 0;
+            _deadAliens[j].GetComponent<Alien>().alive = false;
+            _deadAliens[j].GetComponent<AlienController>().killed = false;
+                SpawnAliensInRound();
         }
+        gaB.population.Clear();
     }
 
     private void AlienLogic()
@@ -329,8 +345,6 @@ public class GeneticAlien : MonoBehaviour
             elapsedTime = 0;
 
         }
-        else if (alienMovementTimer > (alienTickRate/3))
-        SpawnAliensInRound();
     }
 
     //  Check if aliens have a tile to move to, if they do then 
@@ -404,6 +418,10 @@ public class GeneticAlien : MonoBehaviour
         {
                 //Alien Logic
                 var alien = activeAliens[_index].GetComponent<Alien>();
+            if (alien.movesUsed >= allowedMoves)
+            {
+                alien.alive = false;
+            }
                 switch (alien.dna.genes[alien.movesUsed][0])
                 {
                     case 'm':
@@ -433,54 +451,28 @@ public class GeneticAlien : MonoBehaviour
         if (alienID >= 0)
         {
             var alien = primaryAliens[alienID].GetComponent<Alien>();
-            var alien1 = primaryAliens[1].GetComponent<Alien>();
-            var alien2 = primaryAliens[2].GetComponent<Alien>();
-            var alien5 = primaryAliens[5].GetComponent<Alien>();
-
-            //Spawn the aliens at a position based on their genes
-
-            //startTile = Grid.instance.gridTiles[Grid.instance.gridTiles.Count - 1][
-            //    (int)UnityEngine.Random.Range(0, Grid.instance.gridTiles[0].Count)];
-
             var startTile = Grid.instance.gridTiles[0][0];
-
             alien.UpdateSpawn();
-
-            startTile = Grid.instance.gridTiles[(Grid.instance.gridHeight - 1) - alien.spawnYIndex][((Grid.instance.gridLength - 1) - alien.spawnXIndex)];
+            startTile = Grid.instance.gridTiles[(Grid.instance.gridHeight - 3) - alien.spawnYIndex][((Grid.instance.gridLength - 2) - alien.spawnXIndex)];
 
            var i = 1;
             foreach (var listAlien in primaryAliens)
             {
-                var listAlienID = listAlien.GetComponent<Alien>().id;
-                if (listAlien.GetComponent<Alien>() != alien &&
+                var listAlienID = listAlien.GetComponent<Alien>();
+
+                if (listAlienID.id != alien.id &&
                 GetAlienHasValidTile(listAlien) &&
                 listAlien.GetComponent<Alien>().occupiedTile.id == startTile.id)
                 {
-                    startTile = Grid.instance.gridTiles[(Grid.instance.gridHeight - 1) - alien.spawnYIndex - 1][((Grid.instance.gridLength -1 )- alien.spawnXIndex) - i];
-                }
+                    print("I wanna go to " + Grid.instance.gridTiles[(Grid.instance.gridHeight - 3) - alien.spawnYIndex][((Grid.instance.gridLength - 2) - alien.spawnXIndex) - i].id);
+                    startTile = Grid.instance.gridTiles[(Grid.instance.gridHeight - 3) - alien.spawnYIndex][((Grid.instance.gridLength -2 )- alien.spawnXIndex) - i];
                 i++;
+                }
 
             }
-
                alien.instance.transform.position = startTile.boundingBox.position;
                 alien.occupiedTile = startTile;
             
-                
-            //foreach (var listAlien in primaryAliens)
-            //{
-            //    var i = 0;
-            //    if (GetAlienHasValidTile(listAlien) &&
-            //        listAlien.GetComponent<Alien>().occupiedTile == startTile && 
-            //        listAlien.GetComponent<Alien>() != alien)
-            //    {
-            //        alien.instance.transform.position = startTile.boundingBox.position;
-            //        alien.occupiedTile = startTile;
-            //        startTile = Grid.instance.gridTiles[yIndex + 12][(xIndex + 10) - i];
-
-            //    }
-            //    i++;
-            //}
-
             alien.alive = true;
             alien.instance.gameObject.SetActive(true);
             alien.instance.gameObject.transform.localScale = new Vector3(
@@ -640,22 +632,24 @@ public class GeneticAlien : MonoBehaviour
     private float FitnessFunction(int index)
     {
         float score = 0;
-        if (ga.population[index].Owner.hitPlayer)
+        if (index < primaryAliens.Count)
         {
-            score += 5;
-        }
-        else
-        {
+            if (ga.population[index].Owner.hitPlayer)
+            {
+                score += 5;
+            }
             score += Vector3.Distance(ga.population[index].Owner.
-                instance.GetComponent<AlienController>().deathPosition, 
-                new Vector3(0,-0.2f));
+            instance.GetComponent<AlienController>().deathPosition,
+            new Vector3(0, -0.2f));
 
             score /= Vector3.Distance(ga.population[index].Owner.
-                instance.GetComponent<AlienController>().deathPosition, 
-                new Vector3(0,-4));
+                instance.GetComponent<AlienController>().deathPosition,
+                new Vector3(0, -4));
+            score = score * 10;
+            //print("Score" + score + " for alien " + ga.population[index].Owner.instance.GetComponent<AlienController>().uid);
+
         }
-        print("Score" + score +" for alien " +ga.population[index].Owner.instance.GetComponent<AlienController>().uid);
-        return score;
+            return score;
 
     }
     public void ResetAliens()
