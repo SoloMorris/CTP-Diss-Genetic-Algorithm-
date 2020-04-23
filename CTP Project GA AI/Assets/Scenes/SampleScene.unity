@@ -583,7 +583,6 @@ MonoBehaviour:
   difficulty: 0
   deathTimer: 3
   waveTimer: 0.1
-  initialisingRound: 0
 --- !u!114 &464725986
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -667,7 +666,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 5
+  orthographic size: 6
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -1116,7 +1115,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   moveSpeed: 7.77
   bullet: {fileID: 8656924238259196373, guid: 03a126b7ed230064697e3b5a861b7ece, type: 3}
-  ammunition: 5
+  ammunition: 1
   fireTimer: 0
   automatePlayerMovement: 0
 --- !u!61 &1015322097

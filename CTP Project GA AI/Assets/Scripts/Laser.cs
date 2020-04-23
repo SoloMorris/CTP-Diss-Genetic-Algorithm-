@@ -22,9 +22,8 @@ public class Laser : Bullet
             HitTarget(collision, "Wall", false);
             if (HitTarget(collision, "Player"))
             {
-                GeneticAlien._instance.ResetPlayerAI();
-                GeneticAlien._instance.ResetAliens();
                 RoundManager.instance.EndRound(true);
+                GeneticAlien._instance.ResetPlayerAI();
             }
         }
         //Just write a fucntion to kill the alien, retard

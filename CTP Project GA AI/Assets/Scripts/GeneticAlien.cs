@@ -158,6 +158,7 @@ public class GeneticAlien : MonoBehaviour
         {
             alien.GetComponent<Alien>().alive = false;
             alien.GetComponent<AlienController>().killed = false;
+
         }
         SwapGABacktoFront(primaryAliens);
     }
@@ -278,12 +279,17 @@ public class GeneticAlien : MonoBehaviour
                 _alien.targetTile = null;
 
                 var alien = primaryAliens[i].GetComponent<Alien>().instance.gameObject;
+                alien.GetComponent<AlienController>().deathPosition = alien.transform.position;
                 alien.transform.position = new Vector3(-99, -99);
                 alien.transform.localScale = alienSizeDefault;
                 alien.SetActive(false);
-                primaryAliens[i].GetComponent<Alien>().alive = false;
+                alien.GetComponent<AlienController>().killed = false;
+                _alien.alive = false;
                 killCount++;
 
+            }
+            else if (!primaryAliens[i].GetComponent<Alien>().instance.GetComponent<AlienController>().alive)
+            {
                 deadAliens.Add(primaryAliens[i]);
             }
             else if (primaryAliens[i].GetComponent<Alien>().instance.GetComponent<AlienController>().alive)
@@ -293,7 +299,7 @@ public class GeneticAlien : MonoBehaviour
         }
         if (_returnDead)
         {
-            print("There are " + deadAliens.Count + " dead aliens.");
+            //print("There are " + deadAliens.Count + " dead aliens.");
             return deadAliens;
         }
         return null;
@@ -303,7 +309,7 @@ public class GeneticAlien : MonoBehaviour
     //  If it exceeds cap, remove the excess then give all dead aliens the new DNA.
     private void SwapGABacktoFront(List<GameObject> _deadAliens)
     {
-        print("Swapping GA");
+        //print("Swapping GA");
         //  IS NOT BASED ON ROUND LENGTH, PLEASE REMEMBER TO CHANGE HERE
 
         for (int i = 0; i < _deadAliens.Count; i++)
@@ -311,6 +317,7 @@ public class GeneticAlien : MonoBehaviour
             gaB.population.Add(_deadAliens[i].GetComponent<Alien>().dna);
         }
 
+        print("GENERATION "+gaB.generation +": FITNESS "+FindDifficulty());
             gaB.CreateNewGeneration();
 
 
@@ -426,20 +433,13 @@ public class GeneticAlien : MonoBehaviour
                 {
                     case 'm':
                         SetBehaviour('m', _index);
-                        //print("YAAT");
                         break;
                     case 's':
                         SetBehaviour('s', _index);
-                        //print("YEET");
                         break;
                     case 'w':
                     SetBehaviour('w', _index);
-                    print("YOTE");
                         break;
-                        //case 3:
-                        //    if (UnityEngine.Random.Range(1, 10) > 5)
-                        //        aliens[i].GetComponent<Alien>().FireLaser();
-                        //    break;
                 }
                 activeAliens[_index].GetComponent<Alien>().movesUsed++;
         }
@@ -464,9 +464,9 @@ public class GeneticAlien : MonoBehaviour
                 GetAlienHasValidTile(listAlien) &&
                 listAlien.GetComponent<Alien>().occupiedTile.id == startTile.id)
                 {
-                    print("I wanna go to " + Grid.instance.gridTiles[(Grid.instance.gridHeight - 3) - alien.spawnYIndex][((Grid.instance.gridLength - 2) - alien.spawnXIndex) - i].id);
-                    startTile = Grid.instance.gridTiles[(Grid.instance.gridHeight - 3) - alien.spawnYIndex][((Grid.instance.gridLength -2 )- alien.spawnXIndex) - i];
-                i++;
+                    //print("I wanna go to " + Grid.instance.gridTiles[(Grid.instance.gridHeight - 3) - alien.spawnYIndex][((Grid.instance.gridLength - 2) - alien.spawnXIndex) - i].id);
+                    startTile = Grid.instance.gridTiles[(Grid.instance.gridHeight - 3) - alien.spawnYIndex][((Grid.instance.gridLength - 2) - alien.spawnXIndex) - i];
+                    i++;
                 }
 
             }
@@ -634,41 +634,36 @@ public class GeneticAlien : MonoBehaviour
         float score = 0;
         if (index < primaryAliens.Count)
         {
-            if (ga.population[index].Owner.hitPlayer)
+            if (gaB.population[index].Owner.instance.GetComponent<Alien>().hitPlayer)
             {
-                score += 5;
+                score += 2;
             }
-            score += Vector3.Distance(ga.population[index].Owner.
-            instance.GetComponent<AlienController>().deathPosition,
-            new Vector3(0, -0.2f));
+            var startPoint = new Vector2(0, 4.9f);
+            var endPoint = new Vector2(0, -4.5f);
+            var difference = Vector3.Distance(endPoint, startPoint);
+            var currentDist = Vector3.Distance(gaB.population[index].Owner.instance.GetComponent<AlienController>().deathPosition,
+            endPoint);
+            score = difference - currentDist;
 
-            score /= Vector3.Distance(ga.population[index].Owner.
-                instance.GetComponent<AlienController>().deathPosition,
-                new Vector3(0, -4));
-            score = score * 10;
-            //print("Score" + score + " for alien " + ga.population[index].Owner.instance.GetComponent<AlienController>().uid);
+            if (score >= 10)
+            {
+                Debug.LogError("ALIEN " + score + " " + currentDist + " " + difference);
+                Debug.LogError("ALIEN " + gaB.population[index].Owner.transform.position + " " + roundActive);
 
+            }
         }
             return score;
 
     }
-    public void ResetAliens()
+    public float FindDifficulty()
     {
-        for (int i = 0; i < primaryAliens.Count; i++)
+        difficulty = 0;
+        for (int i = 0; i < gaB.population.Count; i++)
         {
-            primaryAliens[i].GetComponent<Alien>().instance.GetComponent<AlienController>().alive = false;
+            difficulty += FitnessFunction(i);
         }
-        CheckIfAliensKilled();
+        return (difficulty);
     }
-    //public float FindDifficulty()
-    //{
-    //    difficulty = 0;
-    //    for (int i = 0; i < activeAliens.Count; i++)
-    //    {
-    //        difficulty += FitnessFunction(i);
-    //    }
-    //    return (difficulty);
-    //}
 
     public GeneticAlgorithm GetGA()
     {

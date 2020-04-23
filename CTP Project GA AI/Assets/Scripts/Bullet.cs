@@ -39,8 +39,6 @@ public class Bullet : MonoBehaviour
                 var hitAlien = GeneticAlien._instance.GetAlienList()[collision.gameObject.
                     GetComponent<AlienController>().uid].GetComponent<GeneticAlien.Alien>();
                 var hitAlienCont = hitAlien.instance.GetComponent<AlienController>();
-
-                hitAlienCont.deathPosition = hitAlien.instance.transform.position;
                 hitAlienCont.killed = true;
             }
         }

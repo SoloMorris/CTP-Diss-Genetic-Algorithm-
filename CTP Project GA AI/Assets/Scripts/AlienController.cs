@@ -6,7 +6,7 @@ public class AlienController : GeneticAlien.Alien
 {
     public bool killed; 
     public int uid;
-    public Vector3 deathPosition = Vector3.zero;
+    public Vector2 deathPosition = Vector2.zero;
     // Start is called before the first frame update
     void Start()
     {

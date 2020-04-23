@@ -79,8 +79,6 @@ public class RoundManager : MonoBehaviour
         {
             if (alien.GetComponent<GeneticAlien.Alien>().occupiedTile != null)
                 alien.GetComponent<GeneticAlien.Alien>().occupiedTile.currentTileState = Grid.Tile.TileState.Empty;
-            alien.GetComponent<AlienController>().deathPosition = alien.transform.position;
-
             alien.GetComponent<GeneticAlien.Alien>().occupiedTile = null;
         }
         GAinst.SetupRound();
