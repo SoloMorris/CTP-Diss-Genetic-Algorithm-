@@ -19,8 +19,8 @@ public class RoundManager : MonoBehaviour
     public float waveTimer = 0.1f;
     private float elapsedTime;
     private float targetTime;
-    // Start is called before the first frame update
 
+    //  Ensure aliens cannot collide with each-other.
     private void Awake()
     {
         if (instance == null) instance = this;
@@ -32,11 +32,7 @@ public class RoundManager : MonoBehaviour
         MonitorRound();
     }
 
-    private void GenerateNewWave()
-    {
-
-    }
-
+    //If the right number of aliens are killed, end the round.
     private void MonitorRound()
     {
         var GAinst = GeneticAlien._instance;
@@ -58,6 +54,8 @@ public class RoundManager : MonoBehaviour
         }
     }
 
+    //Kill all aliens and prepare to create a new generation. 
+    //If the player was hit, reset them as well.
     public void EndRound( bool playerHit = false)
     {
         print("Round over");

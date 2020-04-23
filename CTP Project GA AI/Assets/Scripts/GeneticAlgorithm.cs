@@ -3,6 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+// Tutorial followed : https://www.youtube.com/watch?v=G8KJWONEeGo
+
 [System.Serializable]
 public class GeneticAlgorithm
 {
@@ -18,6 +20,7 @@ public class GeneticAlgorithm
     public int Elitism;
 
 
+    //  Constructor
     public GeneticAlgorithm(int _populationSize, int _dnaSize, System.Random _random, Func<char[]> _getRandomGene, Func<int, float> _fitnessFunction,
         int elitism, float _mutationRate = 0.01f)
     {

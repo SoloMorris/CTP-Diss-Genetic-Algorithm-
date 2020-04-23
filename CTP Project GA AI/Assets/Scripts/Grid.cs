@@ -146,7 +146,8 @@ public class Grid : MonoBehaviour
             }
         }
     }
-    //TODO ID checking for alien logic
+
+    //Used for alien logic and debugging in scene view.
     public bool GetCollisionWithObject(GameObject _object, ref Tile _occupiedTile, Tile.TileState _targetState)
     {
         foreach (var row in gridTiles)
@@ -167,6 +168,8 @@ public class Grid : MonoBehaviour
         }
         return false;
     }
+
+    //  Draws coloured cubes on the scene view to help with debugging
     private void OnDrawGizmos()
     {
         for (int i = 0; i < gridTiles.Count; i++)

@@ -44,10 +44,10 @@ public class GeneticAlien : MonoBehaviour
      *      adopts its values, then GA-B is wiped. 
      *  
      *  Update: When aliens are killed during gameplay
-     *      their genes are added to GA-B's List. 
-     *      When the waveSize is reached, all
-     *      unspawned aliens in GA-A are given 
-     *      GA-B's new improved genes instead.
+     *      their genes are added to tje death List
+     *      When the waveSize / 2 is reached, all
+     *      dead aliens are evolved to create a new generation.
+     *      GA-B receives the new genes and aliens spawn.
      */
     public GeneticAlgorithm ga; //  The primary genetic algorithm
     public GeneticAlgorithm gaB; // The backup genetic algorithm, for alternating between waves.
@@ -138,7 +138,6 @@ public class GeneticAlien : MonoBehaviour
         }
     }
 
-    // Start is called before the first frame update
     void Start()
     {
         var waveSize = RoundManager.instance.roundLength;
@@ -152,6 +151,8 @@ public class GeneticAlien : MonoBehaviour
         roundActive = true;
 
     }
+
+    //Reset all aliens, then create a new generation.
     public void SetupRound()
     {
         foreach (var alien in primaryAliens)
@@ -258,7 +259,8 @@ public class GeneticAlien : MonoBehaviour
      /*
       * By default, handles setting the ActiveAliens and
       * checks if aliens were killed every frame.
-      * List is returned to update GA-B once per epoch
+      * Is needed for resetting as this records DEATH LOCATION.
+      * List is returned to update GA-B once enough aliens are dead
       */
     public List<GameObject> CheckIfAliensKilled(bool _returnDead = false)
     {
@@ -309,8 +311,6 @@ public class GeneticAlien : MonoBehaviour
     //  If it exceeds cap, remove the excess then give all dead aliens the new DNA.
     private void SwapGABacktoFront(List<GameObject> _deadAliens)
     {
-        //print("Swapping GA");
-        //  IS NOT BASED ON ROUND LENGTH, PLEASE REMEMBER TO CHANGE HERE
 
         for (int i = 0; i < _deadAliens.Count; i++)
         {
@@ -332,6 +332,7 @@ public class GeneticAlien : MonoBehaviour
         gaB.population.Clear();
     }
 
+    //Only execute once the tickrate hits to achieve the retro-movement
     private void AlienLogic()
     {
         alienMovementTimer += Time.deltaTime;
@@ -411,6 +412,7 @@ public class GeneticAlien : MonoBehaviour
         }
     }
 
+    //Fire from any tile around the alien.
     private void FireAtTile(int _index)
     {
         var alien = activeAliens[_index].GetComponent<Alien>();
@@ -419,6 +421,8 @@ public class GeneticAlien : MonoBehaviour
             activeAliens[_index].GetComponent<Alien>().FireLaser(alien.targetTile);
         }
     }
+
+    //Call alien behaviour functions based on their current move.
     private void AlienBehaviour(int _index)
     {
         if (elapsedTime > (alienTickRate))
@@ -445,6 +449,8 @@ public class GeneticAlien : MonoBehaviour
         }
     }
 
+    //  Spawn aliens on the grid based on the first characters in their DNA.
+    //  This is delicate code, adjust this if you tweak grid size.
     private void SpawnAliensInRound()
     {
         var alienID = FindAlienInList();
